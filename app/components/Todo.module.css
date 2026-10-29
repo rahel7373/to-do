@@ -1,11 +1,13 @@
 .form {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
   margin-bottom: 20px;
 }
 
 .input {
-  flex: 1;
+  flex: 1 1 200px;
+  min-width: 0;
   padding: 10px 12px;
   font-size: 1rem;
   border: 1px solid #ccc;
@@ -42,6 +44,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
   gap: 12px;
   padding: 12px 0;
   border-bottom: 1px solid #e5e5e5;
@@ -87,4 +90,20 @@
 .overdue .due {
   color: #b91c1c;
   font-weight: 600;
+}
+
+.addButton:hover {
+  background: #1d4ed8;
+}
+
+.deleteButton:hover {
+  background: #e0e0e0;
+}
+
+.input:focus-visible,
+.dateInput:focus-visible,
+.addButton:focus-visible,
+.deleteButton:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
 }

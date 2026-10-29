@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import TodoForm from "./components/TodoForm";
 import TodoList from "./components/TodoList";
+import { sortTodos } from "./lib/date";
 import { loadTodos, saveTodos } from "./lib/storage";
 
 export default function Home() {
@@ -19,12 +20,12 @@ export default function Home() {
     if (loaded) saveTodos(todos);
   }, [todos, loaded]);
 
-  function addTodo(title) {
+  function addTodo(title, dueDate) {
     const todo = {
       id: crypto.randomUUID(),
       title,
       done: false,
-      dueDate: null,
+      dueDate,
       createdAt: Date.now(),
     };
     setTodos((prev) => [todo, ...prev]);
@@ -44,7 +45,13 @@ export default function Home() {
     <main className="container">
       <h1>할 일 관리</h1>
       <TodoForm onAdd={addTodo} />
-      {loaded && <TodoList todos={todos} onToggle={toggleTodo} onDelete={deleteTodo} />}
+      {loaded && (
+        <TodoList
+          todos={sortTodos(todos)}
+          onToggle={toggleTodo}
+          onDelete={deleteTodo}
+        />
+      )}
     </main>
   );
 }

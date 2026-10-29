@@ -1,10 +1,13 @@
 "use client";
 
+import { formatDday, isOverdue } from "../lib/date";
 import styles from "./Todo.module.css";
 
 export default function TodoItem({ todo, onToggle, onDelete }) {
+  const overdue = isOverdue(todo);
+
   return (
-    <li className={styles.item}>
+    <li className={`${styles.item} ${overdue ? styles.overdue : ""}`}>
       <label className={styles.label}>
         <input
           type="checkbox"
@@ -15,6 +18,11 @@ export default function TodoItem({ todo, onToggle, onDelete }) {
           {todo.title}
         </span>
       </label>
+      {todo.dueDate && (
+        <span className={styles.due}>
+          {todo.dueDate} · {formatDday(todo.dueDate)}
+        </span>
+      )}
       <button
         className={styles.deleteButton}
         type="button"

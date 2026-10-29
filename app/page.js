@@ -1,69 +1,44 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+"use client";
+
+import { useEffect, useState } from "react";
+import TodoForm from "./components/TodoForm";
+import TodoList from "./components/TodoList";
+import { loadTodos, saveTodos } from "./lib/storage";
 
 export default function Home() {
+  const [todos, setTodos] = useState([]);
+  const [loaded, setLoaded] = useState(false);
+
+  // localStorage는 브라우저에서만 읽을 수 있으므로 마운트 후에 불러온다.
+  useEffect(() => {
+    setTodos(loadTodos());
+    setLoaded(true);
+  }, []);
+
+  useEffect(() => {
+    if (loaded) saveTodos(todos);
+  }, [todos, loaded]);
+
+  function addTodo(title) {
+    const todo = {
+      id: crypto.randomUUID(),
+      title,
+      done: false,
+      dueDate: null,
+      createdAt: Date.now(),
+    };
+    setTodos((prev) => [todo, ...prev]);
+  }
+
+  function deleteTodo(id) {
+    setTodos((prev) => prev.filter((t) => t.id !== id));
+  }
+
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className={styles.intro}>
-          <h1>
-            To get started, edit the{" "}
-            <code className={styles.code}>page.js</code> file.
-          </h1>
-          <p>
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className={styles.secondary}
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+    <main className="container">
+      <h1>할 일 관리</h1>
+      <TodoForm onAdd={addTodo} />
+      {loaded && <TodoList todos={todos} onDelete={deleteTodo} />}
+    </main>
   );
 }

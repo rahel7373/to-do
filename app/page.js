@@ -30,6 +30,12 @@ export default function Home() {
     setTodos((prev) => [todo, ...prev]);
   }
 
+  function toggleTodo(id) {
+    setTodos((prev) =>
+      prev.map((t) => (t.id === id ? { ...t, done: !t.done } : t))
+    );
+  }
+
   function deleteTodo(id) {
     setTodos((prev) => prev.filter((t) => t.id !== id));
   }
@@ -38,7 +44,7 @@ export default function Home() {
     <main className="container">
       <h1>할 일 관리</h1>
       <TodoForm onAdd={addTodo} />
-      {loaded && <TodoList todos={todos} onDelete={deleteTodo} />}
+      {loaded && <TodoList todos={todos} onToggle={toggleTodo} onDelete={deleteTodo} />}
     </main>
   );
 }

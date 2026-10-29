@@ -2,10 +2,19 @@
 
 import styles from "./Todo.module.css";
 
-export default function TodoItem({ todo, onDelete }) {
+export default function TodoItem({ todo, onToggle, onDelete }) {
   return (
     <li className={styles.item}>
-      <span className={styles.title}>{todo.title}</span>
+      <label className={styles.label}>
+        <input
+          type="checkbox"
+          checked={todo.done}
+          onChange={() => onToggle(todo.id)}
+        />
+        <span className={`${styles.title} ${todo.done ? styles.done : ""}`}>
+          {todo.title}
+        </span>
+      </label>
       <button
         className={styles.deleteButton}
         type="button"

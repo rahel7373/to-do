@@ -56,3 +56,16 @@
   text-align: center;
   padding: 24px 0;
 }
+
+.label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  cursor: pointer;
+}
+
+.done {
+  text-decoration: line-through;
+  color: #888;
+}

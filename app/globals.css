@@ -14,3 +14,31 @@ body {
   margin: 0 auto;
   padding: 40px 16px;
 }
+
+.containerWide {
+  max-width: 1100px;
+}
+
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #ddd;
+}
+
+.tab {
+  padding: 8px 16px;
+  font-size: 0.95rem;
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  cursor: pointer;
+  color: #555;
+}
+
+.tabActive {
+  color: #2563eb;
+  border-bottom-color: #2563eb;
+  font-weight: 600;
+}

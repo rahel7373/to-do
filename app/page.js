@@ -1,57 +1,37 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import TodoForm from "./components/TodoForm";
-import TodoList from "./components/TodoList";
-import { sortTodos } from "./lib/date";
-import { loadTodos, saveTodos } from "./lib/storage";
+import { useState } from "react";
+import TodoView from "./components/TodoView";
+import ScheduleView from "./components/schedule/ScheduleView";
+
+const TABS = [
+  { id: "week", label: "주간" },
+  { id: "month", label: "월간" },
+  { id: "quarter", label: "분기" },
+  { id: "year", label: "연간" },
+  { id: "todo", label: "할 일 목록" },
+];
 
 export default function Home() {
-  const [todos, setTodos] = useState([]);
-  const [loaded, setLoaded] = useState(false);
-
-  // localStorage는 브라우저에서만 읽을 수 있으므로 마운트 후에 불러온다.
-  useEffect(() => {
-    setTodos(loadTodos());
-    setLoaded(true);
-  }, []);
-
-  useEffect(() => {
-    if (loaded) saveTodos(todos);
-  }, [todos, loaded]);
-
-  function addTodo(title, dueDate) {
-    const todo = {
-      id: crypto.randomUUID(),
-      title,
-      done: false,
-      dueDate,
-      createdAt: Date.now(),
-    };
-    setTodos((prev) => [todo, ...prev]);
-  }
-
-  function toggleTodo(id) {
-    setTodos((prev) =>
-      prev.map((t) => (t.id === id ? { ...t, done: !t.done } : t))
-    );
-  }
-
-  function deleteTodo(id) {
-    setTodos((prev) => prev.filter((t) => t.id !== id));
-  }
+  const [tab, setTab] = useState("week");
+  const isTodo = tab === "todo";
 
   return (
-    <main className="container">
-      <h1>할 일 관리</h1>
-      <TodoForm onAdd={addTodo} />
-      {loaded && (
-        <TodoList
-          todos={sortTodos(todos)}
-          onToggle={toggleTodo}
-          onDelete={deleteTodo}
-        />
-      )}
+    <main className={isTodo ? "container" : "container containerWide"}>
+      <h1>업무 관리</h1>
+      <nav className="tabs" aria-label="보기 선택">
+        {TABS.map((t) => (
+          <button
+            key={t.id}
+            type="button"
+            className={t.id === tab ? "tab tabActive" : "tab"}
+            onClick={() => setTab(t.id)}
+          >
+            {t.label}
+          </button>
+        ))}
+      </nav>
+      {isTodo ? <TodoView /> : <ScheduleView view={tab} onChangeView={setTab} />}
     </main>
   );
 }

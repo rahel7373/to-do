@@ -1,0 +1,362 @@
+/* 종류별 색 */
+.work {
+  --c-bg: #dbeafe;
+  --c-fg: #1e3a8a;
+}
+.holiday {
+  --c-bg: #fee2e2;
+  --c-fg: #991b1b;
+}
+.leave {
+  --c-bg: #dcfce7;
+  --c-fg: #166534;
+}
+
+/* 입력 폼 */
+.form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.field {
+  padding: 8px 10px;
+  font-size: 0.95rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background: #fff;
+}
+
+.titleField {
+  flex: 1 1 180px;
+  min-width: 0;
+}
+
+.fieldLabel {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 0.75rem;
+  color: #666;
+}
+
+.addButton {
+  padding: 9px 16px;
+  font-size: 0.95rem;
+  border: none;
+  border-radius: 6px;
+  background: #2563eb;
+  color: #fff;
+  cursor: pointer;
+}
+
+.addButton:hover {
+  background: #1d4ed8;
+}
+
+.error {
+  flex-basis: 100%;
+  margin: 0;
+  color: #b91c1c;
+  font-size: 0.9rem;
+}
+
+/* 이동 바 */
+.nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.navLabel {
+  min-width: 190px;
+  text-align: center;
+}
+
+.navButton {
+  padding: 6px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background: #fff;
+  cursor: pointer;
+}
+
+.legend {
+  margin-left: auto;
+  font-size: 0.85rem;
+  color: #555;
+}
+
+.dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  margin: 0 4px 0 10px;
+  border-radius: 50%;
+  background: var(--c-fg);
+}
+
+/* 항목 칩 */
+.chip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+  margin-top: 2px;
+  padding: 2px 6px;
+  font-size: 0.8rem;
+  border-radius: 4px;
+  background: var(--c-bg);
+  color: var(--c-fg);
+}
+
+.chipText {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chipDelete {
+  padding: 0 2px;
+  border: none;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.today {
+  background: #fffbeb;
+}
+
+.weekend {
+  background: #f5f5f5;
+}
+
+.weekendText {
+  color: #b91c1c;
+}
+
+.muted {
+  color: #888;
+  font-size: 0.9rem;
+}
+
+/* 주간 */
+.week {
+  overflow-x: auto;
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.weekRow {
+  display: grid;
+  grid-template-columns: 56px repeat(5, minmax(120px, 1fr));
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.timeCol {
+  font-size: 0.75rem;
+  color: #888;
+  text-align: right;
+  padding-right: 6px;
+}
+
+.hourLabel {
+  padding-top: 2px;
+}
+
+.allDayLabel {
+  padding-top: 6px;
+}
+
+.dayHead {
+  padding: 8px;
+  text-align: center;
+  font-weight: 600;
+  border-left: 1px solid #e5e5e5;
+}
+
+.allDayCell {
+  min-height: 34px;
+  padding: 2px 4px 4px;
+  border-left: 1px solid #e5e5e5;
+}
+
+.dayCol {
+  position: relative;
+  border-left: 1px solid #e5e5e5;
+}
+
+.hourLine {
+  border-bottom: 1px dashed #e5e5e5;
+}
+
+.timedEvent {
+  position: absolute;
+  overflow: hidden;
+  padding: 1px 2px;
+}
+
+.timedEvent .chip {
+  height: 100%;
+  align-items: flex-start;
+  margin-top: 0;
+}
+
+/* 월간 */
+.month {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  border-top: 1px solid #e5e5e5;
+  border-left: 1px solid #e5e5e5;
+  background: #fff;
+}
+
+.monthHead {
+  padding: 6px;
+  text-align: center;
+  font-weight: 600;
+  border-right: 1px solid #e5e5e5;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.monthBlank,
+.monthCell {
+  min-height: 92px;
+  padding: 4px;
+  border-right: 1px solid #e5e5e5;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.monthCell {
+  cursor: pointer;
+}
+
+.dayNum {
+  font-size: 0.8rem;
+  color: #555;
+}
+
+/* 분기 */
+.quarter {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.quarterMonth {
+  padding: 12px;
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.quarterMonth h3 {
+  margin: 0 0 8px;
+}
+
+.eventList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.eventList li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0;
+}
+
+.eventList li .chip {
+  flex: 1;
+  min-width: 0;
+}
+
+.eventDate {
+  font-size: 0.8rem;
+  color: #666;
+  white-space: nowrap;
+}
+
+.eventType {
+  font-size: 0.75rem;
+  color: #888;
+  white-space: nowrap;
+}
+
+/* 연간 */
+.year {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 16px;
+}
+
+.yearMonth {
+  padding: 10px;
+  text-align: left;
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  background: #fff;
+  cursor: pointer;
+}
+
+.yearMonth:hover {
+  border-color: #2563eb;
+}
+
+.yearMonth h3 {
+  margin: 0 0 6px;
+}
+
+.miniGrid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+  text-align: center;
+  font-size: 0.75rem;
+}
+
+.miniHead {
+  color: #888;
+}
+
+.miniDay {
+  padding: 2px 0;
+  border-radius: 3px;
+}
+
+.day_work {
+  background: #dbeafe;
+  color: #1e3a8a;
+}
+.day_holiday {
+  background: #fee2e2;
+  color: #991b1b;
+}
+.day_leave {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.yearCounts {
+  margin: 8px 0 0;
+  font-size: 0.75rem;
+  color: #666;
+}
+
+.nav button:focus-visible,
+.addButton:focus-visible,
+.field:focus-visible,
+.chipDelete:focus-visible,
+.yearMonth:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}

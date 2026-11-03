@@ -1,4 +1,4 @@
-function toLocalDate(str) {
+export function toLocalDate(str) {
   const [y, m, d] = str.split("-").map(Number);
   return new Date(y, m - 1, d);
 }
@@ -31,3 +31,48 @@ export function sortTodos(todos) {
     return b.createdAt - a.createdAt;
   });
 }
+
+const pad = (n) => String(n).padStart(2, "0");
+
+export function toYMD(d) {
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+}
+
+export function todayYMD() {
+  return toYMD(new Date());
+}
+
+export function addDays(ymd, n) {
+  const d = toLocalDate(ymd);
+  d.setDate(d.getDate() + n);
+  return toYMD(d);
+}
+
+// 말일을 넘기지 않도록 일(day)을 보정해서 월을 더한다.
+export function addMonths(ymd, n) {
+  const d = toLocalDate(ymd);
+  const day = d.getDate();
+  d.setDate(1);
+  d.setMonth(d.getMonth() + n);
+  d.setDate(Math.min(day, daysInMonth(d.getFullYear(), d.getMonth() + 1)));
+  return toYMD(d);
+}
+
+// month: 1~12
+export function daysInMonth(year, month) {
+  return new Date(year, month, 0).getDate();
+}
+
+// 해당 날짜가 속한 주의 월요일
+export function startOfWeek(ymd) {
+  const d = toLocalDate(ymd);
+  d.setDate(d.getDate() - ((d.getDay() + 6) % 7));
+  return toYMD(d);
+}
+
+// 월요일 = 0 ... 일요일 = 6
+export function weekdayIndex(ymd) {
+  return (toLocalDate(ymd).getDay() + 6) % 7;
+}
+
+export const WEEKDAYS = ["월", "화", "수", "목", "금", "토", "일"];

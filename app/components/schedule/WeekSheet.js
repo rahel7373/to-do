@@ -3,16 +3,14 @@
 import { useState } from "react";
 import { addDays, startOfWeek, todayYMD, WEEKDAYS } from "../../lib/date";
 import {
-  CHECK_ITEMS,
-  CUSTOM_PLACE,
   INTERVIEW_SLOTS,
   MARK_KINDS,
-  MEETING_PLACES,
   MEETING_SLOTS,
   TODO_SLOTS,
   getDay,
 } from "../../lib/dayLog";
 import { holidayOf } from "../../lib/holidays";
+import MeetingCell from "./MeetingCell";
 import { recurringOn } from "../../lib/recurring";
 import { eventsOn } from "../../lib/schedule";
 import styles from "./Schedule.module.css";
@@ -35,7 +33,19 @@ function holidayInfo(ymd, events) {
 }
 
 // 주간 시트: 월~금 열마다 그날의 업무 항목을 한 장에 모아 둔다.
-export default function WeekSheet({ anchor, events, days, onChangeDay }) {
+export default function WeekSheet({
+  anchor,
+  events,
+  days,
+  rules,
+  config,
+  onChangeDay,
+  onAddRule,
+  onDeleteRule,
+  onChangeConfig,
+}) {
+  // 확인사항 칸(차주 헬퍼 이하) 이름·항목 편집 모드
+  const [editItems, setEditItems] = useState(false);
   // 수동 표시(휴가·외부 교육 등)를 편집 중인 날짜
   const [editing, setEditing] = useState("");
   // 비어 있는 회의 칸 중 펼쳐 둔 칸 ("날짜#칸번호")
@@ -43,7 +53,7 @@ export default function WeekSheet({ anchor, events, days, onChangeDay }) {
   const monday = startOfWeek(anchor);
   const dates = range(5).map((i) => addDays(monday, i));
   const today = todayYMD();
-  const dayOf = (ymd) => getDay(days, ymd);
+  const dayOf = (ymd) => getDay(days, ymd, rules);
   const holidays = Object.fromEntries(
     dates.map((ymd) => [ymd, holidayInfo(ymd, events)])
   );
@@ -80,7 +90,7 @@ export default function WeekSheet({ anchor, events, days, onChangeDay }) {
   const row = (
     title,
     render,
-    { span, first = true, id = title, accent = "" } = {}
+    { span, first = true, id = title, accent = "", labelNode = null } = {}
   ) => (
     <tr key={id}>
       {first && (
@@ -89,7 +99,7 @@ export default function WeekSheet({ anchor, events, days, onChangeDay }) {
           className={`${styles.rowLabel} ${accent ? styles[`${accent}Label`] : ""}`}
           rowSpan={span}
         >
-          {title}
+          {labelNode ?? title}
         </th>
       )}
       {dates.map((ymd) => (
@@ -113,8 +123,62 @@ export default function WeekSheet({ anchor, events, days, onChangeDay }) {
       />
     ));
 
+  const labels = config.labels;
+  const setLabel = (key, value) =>
+    onChangeConfig((c) => ({ ...c, labels: { ...c.labels, [key]: value } }));
+  const setItemLabel = (id, value) =>
+    onChangeConfig((c) => ({
+      ...c,
+      checkItems: c.checkItems.map((it) =>
+        it.id === id ? { ...it, label: value } : it
+      ),
+    }));
+  const addItem = () =>
+    onChangeConfig((c) => ({
+      ...c,
+      checkItems: [
+        ...c.checkItems,
+        { id: crypto.randomUUID(), label: "새 확인 항목" },
+      ],
+    }));
+  const removeItem = (item) => {
+    if (!window.confirm(`"${item.label}" 항목을 삭제할까요?`)) return;
+    onChangeConfig((c) => ({
+      ...c,
+      checkItems: c.checkItems.filter((it) => it.id !== item.id),
+    }));
+  };
+  // 편집 모드에서는 라벨이 입력칸이 된다.
+  const editableLabel = (value, onChange, extra = null) =>
+    editItems ? (
+      <div className={styles.labelEdit}>
+        <input
+          className={styles.labelInput}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          aria-label={`항목 이름 ${value}`}
+        />
+        {extra}
+      </div>
+    ) : null;
+
   return (
     <div className={styles.sheetWrap}>
+      <div className={styles.sheetTools}>
+        <button
+          type="button"
+          className={styles.navButton}
+          onClick={() => setEditItems((v) => !v)}
+          aria-pressed={editItems}
+        >
+          {editItems ? "항목 편집 끝내기" : "확인사항 항목 편집"}
+        </button>
+        {editItems && (
+          <span className={styles.muted}>
+            차주 헬퍼 아래 칸의 이름을 바꾸거나 항목을 더하고 뺄 수 있어요.
+          </span>
+        )}
+      </div>
       <table className={styles.sheet}>
         <thead>
           <tr>
@@ -223,101 +287,19 @@ export default function WeekSheet({ anchor, events, days, onChangeDay }) {
               (ymd, d) => {
                 const m = d.meetings[i];
                 const key = `${ymd}#${i}`;
-                const empty =
-                  !m.time && !m.place && !m.title && !m.custom && !m.important;
-                if (empty && !openSlots[key]) {
-                  return (
-                    <button
-                      type="button"
-                      className={styles.addMeeting}
-                      onClick={() =>
-                        setOpenSlots((s) => ({ ...s, [key]: true }))
-                      }
-                      aria-label={`${label(ymd)} 회의 ${i + 1} 추가`}
-                    >
-                      + 회의
-                    </button>
-                  );
-                }
                 return (
-                  <div
-                    className={`${styles.meeting} ${m.important ? styles.important : ""}`}
-                  >
-                    <div className={styles.meetingTop}>
-                      <input
-                        className={styles.cellInput}
-                        type="time"
-                        value={m.time}
-                        onChange={(e) =>
-                          setItem(ymd, "meetings", i, { time: e.target.value })
-                        }
-                        aria-label={`${label(ymd)} 회의 ${i + 1} 시간`}
-                      />
-                      <button
-                        type="button"
-                        className={`${styles.star} ${m.important ? styles.starOn : ""}`}
-                        onClick={() =>
-                          setItem(ymd, "meetings", i, {
-                            important: !m.important,
-                          })
-                        }
-                        aria-pressed={!!m.important}
-                        aria-label={`${label(ymd)} 회의 ${i + 1} 중요 표시`}
-                        title="중요 일정"
-                      >
-                        {m.important ? "★" : "☆"}
-                      </button>
-                      {empty && (
-                        <button
-                          type="button"
-                          className={styles.star}
-                          onClick={() =>
-                            setOpenSlots((s) => ({ ...s, [key]: false }))
-                          }
-                          aria-label={`${label(ymd)} 회의 ${i + 1} 접기`}
-                          title="접기"
-                        >
-                          ✕
-                        </button>
-                      )}
-                    </div>
-                    <select
-                      className={styles.cellInput}
-                      value={m.place}
-                      onChange={(e) =>
-                        setItem(ymd, "meetings", i, { place: e.target.value })
-                      }
-                      aria-label={`${label(ymd)} 회의 ${i + 1} 장소`}
-                    >
-                      <option value="">장소 선택</option>
-                      {MEETING_PLACES.map((p) => (
-                        <option key={p} value={p}>
-                          {p}
-                        </option>
-                      ))}
-                      <option value={CUSTOM_PLACE}>{CUSTOM_PLACE}</option>
-                    </select>
-                    {m.place === CUSTOM_PLACE && (
-                      <input
-                        className={styles.cellInput}
-                        value={m.custom}
-                        placeholder="장소 입력"
-                        onChange={(e) =>
-                          setItem(ymd, "meetings", i, { custom: e.target.value })
-                        }
-                        aria-label={`${label(ymd)} 회의 ${i + 1} 장소 직접 입력`}
-                      />
-                    )}
-                    <input
-                      className={styles.cellInput}
-                      value={m.title}
-                      placeholder="회의 제목"
-                      onChange={(e) =>
-                        setItem(ymd, "meetings", i, { title: e.target.value })
-                      }
-                      aria-label={`${label(ymd)} 회의 ${i + 1} 제목`}
-                    />
-                  </div>
+                  <MeetingCell
+                    ymd={ymd}
+                    index={i}
+                    label={label(ymd)}
+                    meeting={m}
+                    rule={rules.find((r) => r.id === m.ruleId)}
+                    open={!!openSlots[key]}
+                    onOpen={(v) => setOpenSlots((s) => ({ ...s, [key]: v }))}
+                    onPatch={(patch) => setItem(ymd, "meetings", i, patch)}
+                    onAddRule={onAddRule}
+                    onDeleteRule={onDeleteRule}
+                  />
                 );
               },
               {
@@ -392,37 +374,73 @@ export default function WeekSheet({ anchor, events, days, onChangeDay }) {
 
           {textRow("팀장님 외부재", "leaderAbsent")}
           {textRow("운영간호사 부재", "nurseAbsent")}
-          {row("차주 헬퍼", (ymd, d) => (
+          {row(labels.helper, (ymd, d) => (
             <div className={styles.todoCell}>
               <input
                 type="checkbox"
                 checked={!!d.helperDone}
                 onChange={(e) => setField(ymd, "helperDone", e.target.checked)}
-                aria-label={`${label(ymd)} 차주 헬퍼 완료`}
+                aria-label={`${label(ymd)} ${labels.helper} 완료`}
               />
               <input
                 className={`${styles.cellInput} ${d.helperDone ? styles.doneText : ""}`}
                 value={d.helper}
                 onChange={(e) => setField(ymd, "helper", e.target.value)}
-                aria-label={`${label(ymd)} 차주 헬퍼`}
+                aria-label={`${label(ymd)} ${labels.helper}`}
               />
             </div>
-          ))}
+          ), {
+            id: "helper",
+            labelNode: editableLabel(labels.helper, (v) => setLabel("helper", v)),
+          })}
 
-          {CHECK_ITEMS.map(([key, title]) =>
-            row(title, (ymd, d) => (
-              <label className={styles.checkCell}>
-                <input
-                  type="checkbox"
-                  checked={d.checks[key]}
-                  onChange={(e) => setCheck(ymd, key, e.target.checked)}
-                />
-                <span>{d.checks[key] ? "완료" : "미완료"}</span>
-              </label>
-            ))
+          {config.checkItems.map((item) =>
+            row(
+              item.label,
+              (ymd, d) => (
+                <label className={styles.checkCell}>
+                  <input
+                    type="checkbox"
+                    checked={!!d.checks[item.id]}
+                    onChange={(e) => setCheck(ymd, item.id, e.target.checked)}
+                    aria-label={`${label(ymd)} ${item.label}`}
+                  />
+                  <span>{d.checks[item.id] ? "완료" : "미완료"}</span>
+                </label>
+              ),
+              {
+                id: `check-${item.id}`,
+                labelNode: editableLabel(
+                  item.label,
+                  (v) => setItemLabel(item.id, v),
+                  <button
+                    type="button"
+                    className={styles.labelDelete}
+                    onClick={() => removeItem(item)}
+                    aria-label={`${item.label} 항목 삭제`}
+                    title="항목 삭제"
+                  >
+                    ✕
+                  </button>
+                ),
+              }
+            )
+          )}
+          {editItems && (
+            <tr key="add-item">
+              <td colSpan={6} className={styles.addItemRow}>
+                <button
+                  type="button"
+                  className={styles.navButton}
+                  onClick={addItem}
+                >
+                  + 확인 항목 추가
+                </button>
+              </td>
+            </tr>
           )}
 
-          {row("정기 업무", (ymd, d) => (
+          {row(labels.recur, (ymd, d) => (
             <div className={styles.recurList}>
               {recurringOn(ymd).map((r) => {
                 const done = !!d.recurDone?.[r.id];
@@ -449,9 +467,13 @@ export default function WeekSheet({ anchor, events, days, onChangeDay }) {
                 );
               })}
             </div>
-          ), { accent: "recur" })}
+          ), {
+            id: "recur",
+            accent: "recur",
+            labelNode: editableLabel(labels.recur, (v) => setLabel("recur", v)),
+          })}
 
-          {row("마약류 사인", (ymd, d) => (
+          {row(labels.narcotics, (ymd, d) => (
             <div className={styles.todoCell}>
               <input
                 type="checkbox"
@@ -464,10 +486,13 @@ export default function WeekSheet({ anchor, events, days, onChangeDay }) {
                 value={d.narcoticsSign}
                 placeholder="사인"
                 onChange={(e) => setField(ymd, "narcoticsSign", e.target.value)}
-                aria-label={`${label(ymd)} 마약류 사인`}
+                aria-label={`${label(ymd)} ${labels.narcotics}`}
               />
             </div>
-          ))}
+          ), {
+            id: "narcotics",
+            labelNode: editableLabel(labels.narcotics, (v) => setLabel("narcotics", v)),
+          })}
         </tbody>
       </table>
     </div>

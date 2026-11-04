@@ -74,9 +74,11 @@ export function defaultDay(ymd) {
     meetings: defaultMeetings(ymd),
     todos: range(TODO_SLOTS, () => ({ text: "", done: false })),
     interviews: range(INTERVIEW_SLOTS, () => ""),
+    interviewDone: range(INTERVIEW_SLOTS, () => false),
     leaderAbsent: "",
     nurseAbsent: "",
     helper: HELPER_DEFAULTS[weekdayIndex(ymd)] ?? "",
+    helperDone: false,
     checks: {
       workReport: false,
       attendance: false,

@@ -8,6 +8,7 @@ import {
   weekdayIndex,
 } from "../../lib/date";
 import { eventsOn, sortAllDay } from "../../lib/schedule";
+import { recurringInMonth } from "../../lib/recurring";
 import EventChip from "./EventChip";
 import styles from "./Schedule.module.css";
 
@@ -19,6 +20,7 @@ export default function MonthView({ anchor, events, onDelete, onPickDate }) {
   const month = d.getMonth() + 1;
   const blanks = weekdayIndex(`${year}-${pad(month)}-01`);
   const today = todayYMD();
+  const recur = recurringInMonth(year, month);
   const days = Array.from({ length: daysInMonth(year, month) }, (_, i) => i + 1);
 
   return (
@@ -48,6 +50,18 @@ export default function MonthView({ anchor, events, onDelete, onPickDate }) {
             onClick={() => onPickDate(ymd)}
           >
             <div className={styles.dayNum}>{day}</div>
+            {recur
+              .filter((r) => r.ymd === ymd)
+              .map((r) => (
+                <div
+                  key={r.item.id}
+                  className={styles.recurChip}
+                  title={r.quarterly ? "분기 업무" : "매월 업무"}
+                >
+                  {r.quarterly ? "분기 " : ""}
+                  {r.item.label}
+                </div>
+              ))}
             {list.map((ev) => (
               <EventChip key={ev.id} ev={ev} onDelete={onDelete} showTime />
             ))}

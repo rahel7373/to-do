@@ -2,6 +2,7 @@
 
 import { daysInMonth, toLocalDate } from "../../lib/date";
 import { EVENT_TYPES } from "../../lib/schedule";
+import { recurringInMonth } from "../../lib/recurring";
 import EventChip from "./EventChip";
 import styles from "./Schedule.module.css";
 
@@ -25,11 +26,23 @@ export default function QuarterView({ anchor, events, onDelete }) {
               a.startDate.localeCompare(b.startDate) ||
               a.createdAt - b.createdAt
           );
+        const recur = recurringInMonth(year, m);
         return (
           <section key={m} className={styles.quarterMonth}>
             <h3>{m}월</h3>
+            <ul className={styles.eventList}>
+              {recur.map((r) => (
+                <li key={r.item.id}>
+                  <span className={styles.eventDate}>{r.ymd.slice(5)}</span>
+                  <span className={styles.eventType}>
+                    {r.quarterly ? "분기 업무" : "매월 업무"}
+                  </span>
+                  <span className={styles.recurChip}>{r.item.label}</span>
+                </li>
+              ))}
+            </ul>
             {list.length === 0 ? (
-              <p className={styles.muted}>등록된 일정이 없습니다.</p>
+              <p className={styles.muted}>등록된 일정이 없습니다. (정기 업무는 위에 표시)</p>
             ) : (
               <ul className={styles.eventList}>
                 {list.map((ev) => (

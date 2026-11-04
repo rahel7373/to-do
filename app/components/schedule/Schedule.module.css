@@ -1299,3 +1299,16 @@
 .groupStart:first-child > td {
   box-shadow: none;
 }
+
+/* 월간·분기 보기의 정기 업무 */
+.recurChip {
+  display: block;
+  margin: 2px 0;
+  padding: 2px 6px;
+  border-radius: 6px;
+  border-left: 3px solid #e9a3c2;
+  background: #fdeef5;
+  color: #9d174d;
+  font-size: 0.78rem;
+  line-height: 1.3;
+}

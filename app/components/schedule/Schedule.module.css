@@ -911,3 +911,48 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* 폭 더 줄이기, 표시 수정 버튼은 날짜 옆, 진료과 줄 이름은 한 줄 */
+.layout {
+  grid-template-columns: 150px minmax(0, 1fr);
+}
+
+.sidebar .navButton {
+  padding: 3px 0;
+  font-size: 0.8rem;
+}
+
+.sidebar .tab,
+.sidebar .tabsCompact .tab {
+  padding: 4px 7px;
+}
+
+.headLine {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.headLine .markButton {
+  display: inline-block;
+  margin: 0;
+}
+
+.sheet .rowLabel {
+  width: 165px;
+}
+
+.sheet .labelInput {
+  font-size: 0.82rem;
+}
+
+.sidebar .legend {
+  font-size: 0.72rem;
+  white-space: nowrap;
+}
+
+.sidebar .dot {
+  margin: 0 2px 0 4px;
+}

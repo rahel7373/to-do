@@ -71,3 +71,13 @@ export function recurringOn(ymd) {
     (r) => (!r.months || r.months.includes(m)) && dueDate(y, m, r.day) === ymd
   );
 }
+
+// 한 달 안의 정기 업무: [{ ymd, item, quarterly }] (날짜순)
+export function recurringInMonth(year, month) {
+  const out = [];
+  for (const r of RECURRING) {
+    if (r.months && !r.months.includes(month)) continue;
+    out.push({ ymd: dueDate(year, month, r.day), item: r, quarterly: !!r.months });
+  }
+  return out.sort((a, b) => a.ymd.localeCompare(b.ymd));
+}

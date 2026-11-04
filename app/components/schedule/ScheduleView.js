@@ -8,7 +8,13 @@ import {
   toLocalDate,
   todayYMD,
 } from "../../lib/date";
-import { getDay } from "../../lib/dayLog";
+import {
+  DEFAULT_MEETING_RULES,
+  DEFAULT_SHEET_CONFIG,
+  getConfig,
+  getDay,
+  packDay,
+} from "../../lib/dayLog";
 import { useLocalList, useLocalState } from "../../lib/useLocalList";
 import EventForm from "./EventForm";
 import MonthView from "./MonthView";
@@ -44,6 +50,15 @@ const EMPTY_DAYS = {};
 export default function ScheduleView({ view, onChangeView }) {
   const [events, setEvents, loaded] = useLocalList("events");
   const [days, setDays, daysLoaded] = useLocalState("days", EMPTY_DAYS);
+  const [rules, setRules, rulesLoaded] = useLocalState(
+    "meetingRules",
+    DEFAULT_MEETING_RULES
+  );
+  const [savedConfig, setConfig, configLoaded] = useLocalState(
+    "sheetConfig",
+    DEFAULT_SHEET_CONFIG
+  );
+  const config = getConfig(savedConfig);
   // 오늘 날짜는 서버 렌더링 때 알 수 없으므로 마운트 후에 채운다.
   const [anchor, setAnchor] = useState("");
   const [formDate, setFormDate] = useState("");
@@ -54,7 +69,8 @@ export default function ScheduleView({ view, onChangeView }) {
     setFormDate(today);
   }, []);
 
-  const ready = loaded && daysLoaded && anchor !== "";
+  const ready =
+    loaded && daysLoaded && rulesLoaded && configLoaded && anchor !== "";
 
   function addEvent(data) {
     setEvents((prev) => [
@@ -65,7 +81,10 @@ export default function ScheduleView({ view, onChangeView }) {
 
   // 날짜별 업무 시트 수정: 저장된 값이 없으면 기본값에서 시작한다.
   function changeDay(ymd, update) {
-    setDays((prev) => ({ ...prev, [ymd]: update(getDay(prev, ymd)) }));
+    setDays((prev) => ({
+      ...prev,
+      [ymd]: packDay(update(getDay(prev, ymd, rules)), ymd, rules),
+    }));
   }
 
   function deleteEvent(id) {
@@ -127,7 +146,14 @@ export default function ScheduleView({ view, onChangeView }) {
           anchor={anchor}
           events={events}
           days={days}
+          rules={rules}
+          config={config}
           onChangeDay={changeDay}
+          onAddRule={(rule) => setRules((prev) => [...prev, rule])}
+          onDeleteRule={(id) =>
+            setRules((prev) => prev.filter((r) => r.id !== id))
+          }
+          onChangeConfig={(update) => setConfig((prev) => update(getConfig(prev)))}
         />
       )}
       {ready && view === "month" && (

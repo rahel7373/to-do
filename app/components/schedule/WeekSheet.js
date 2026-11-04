@@ -351,7 +351,6 @@ export default function WeekSheet({
                 span: MEETING_SLOTS,
                 first: i === 0,
                 id: `meeting${i}`,
-                accent: "meeting",
                 labelNode: editableLabel(labels.meetings, (v) =>
                   setLabel("meetings", v)
                 ),

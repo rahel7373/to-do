@@ -14,6 +14,13 @@ export const MEETING_PLACES = [
   "팀장님방",
 ];
 
+// 날짜 머리글에 크리스마스처럼 표시하는 수동 표시 (key, 라벨, 기본 문구)
+export const MARK_KINDS = [
+  ["leave", "휴가", "휴가"],
+  ["training", "외부 교육", "외부 교육"],
+  ["off", "기타 휴무", ""],
+];
+
 export const MEETING_SLOTS = 4;
 export const TODO_SLOTS = 8;
 export const INTERVIEW_SLOTS = 2;
@@ -28,7 +35,13 @@ export const CHECK_ITEMS = [
 
 const range = (n, make) => Array.from({ length: n }, make);
 
-const emptyMeeting = () => ({ time: "", place: "", custom: "", title: "" });
+const emptyMeeting = () => ({
+  time: "",
+  place: "",
+  custom: "",
+  title: "",
+  important: false,
+});
 
 // 요일별로 미리 들어가는 회의 (월요일 = 0). 값은 수정할 수 있다.
 const FIXED_MEETINGS = {
@@ -54,6 +67,7 @@ const HELPER_DEFAULTS = { 1: "차주헬퍼 장부 작성", 2: "차주헬퍼 공�
 
 export function defaultDay(ymd) {
   return {
+    mark: null, // { kind: "leave" | "training" | "off", text }
     patients: "",
     amDepts: "",
     pmDepts: "",

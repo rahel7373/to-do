@@ -43,9 +43,8 @@ export default function WeekSheet({
   onAddRule,
   onDeleteRule,
   onChangeConfig,
+  editItems,
 }) {
-  // 확인사항 칸(차주 헬퍼 이하) 이름·항목 편집 모드
-  const [editItems, setEditItems] = useState(false);
   const wrapRef = useRef(null);
 
   // 노트북 화면 한 장에 들어오도록 시트 크기를 화면 높이에 맞춘다 (최소 60%).
@@ -189,21 +188,6 @@ export default function WeekSheet({
 
   return (
     <div className={styles.sheetWrap} ref={wrapRef}>
-      <div className={styles.sheetTools}>
-        <button
-          type="button"
-          className={styles.navButton}
-          onClick={() => setEditItems((v) => !v)}
-          aria-pressed={editItems}
-        >
-          {editItems ? "항목 편집 끝내기" : "확인사항 항목 편집"}
-        </button>
-        {editItems && (
-          <span className={styles.muted}>
-            항목을 더하고 뺄 수 있어요. 이름은 편집 모드가 아니어도 눌러서 바로 바꿀 수 있어요.
-          </span>
-        )}
-      </div>
       <table className={styles.sheet}>
         <thead>
           <tr>

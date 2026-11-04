@@ -848,3 +848,36 @@
   font-size: 0.78rem;
   line-height: 1.4;
 }
+
+/* 할 일 칸 추가 버튼 */
+.addTodo {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: 1px dashed #93c5fd;
+  border-radius: 4px;
+  background: #fff;
+  color: #2563eb;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.addTodo:hover {
+  background: #dbeafe;
+}
+
+/* 글자를 다시 키운다 (칸 수가 줄어 크기 맞춤 배율이 올라감) */
+.sheet {
+  font-size: 0.86rem;
+}
+
+.sheet .rowLabel,
+.sheet .cellInput,
+.sheet .labelInput {
+  font-size: 0.86rem;
+}
+
+.sheet .sheetHead {
+  font-size: 0.92rem;
+}

@@ -6,6 +6,7 @@ import {
   INTERVIEW_SLOTS,
   MARK_KINDS,
   MEETING_SLOTS,
+  TODO_DEFAULT_SHOWN,
   TODO_SLOTS,
   getDay,
 } from "../../lib/dayLog";
@@ -129,17 +130,39 @@ export default function WeekSheet({
     </tr>
   );
 
-  const textRow = (title, key) =>
-    row(title, (ymd, d) => (
-      <input
-        className={styles.cellInput}
-        value={d[key]}
-        onChange={(e) => setField(ymd, key, e.target.value)}
-        aria-label={`${label(ymd)} ${title}`}
-      />
-    ));
+  const textRow = (labelKey, key) =>
+    row(
+      labels[labelKey],
+      (ymd, d) => (
+        <input
+          className={styles.cellInput}
+          value={d[key]}
+          onChange={(e) => setField(ymd, key, e.target.value)}
+          aria-label={`${label(ymd)} ${labels[labelKey]}`}
+        />
+      ),
+      {
+        id: labelKey,
+        labelNode: editableLabel(labels[labelKey], (v) => setLabel(labelKey, v)),
+      }
+    );
 
   const labels = config.labels;
+  // 날짜별로 보이는 할 일 칸 수: 기본 4칸, 내용이 더 뒤에 있으면 거기까지.
+  const shownTodos = (d) => {
+    let last = -1;
+    d.todos.forEach((t, i) => {
+      if (t.text || t.done) last = i;
+    });
+    return Math.min(
+      TODO_SLOTS,
+      Math.max(d.todoCount ?? TODO_DEFAULT_SHOWN, last + 1)
+    );
+  };
+  const todoRows = Math.max(
+    TODO_DEFAULT_SHOWN,
+    ...dates.map((ymd) => shownTodos(dayOf(ymd)))
+  );
   const setLabel = (key, value) =>
     onChangeConfig((c) => ({ ...c, labels: { ...c.labels, [key]: value } }));
   const setItemLabel = (id, value) =>
@@ -277,22 +300,31 @@ export default function WeekSheet({
           </tr>
         </thead>
         <tbody>
-          {row("총 환자 수", (ymd, d) => (
-            <input
-              className={styles.cellInput}
-              type="number"
-              min="0"
-              value={d.patients}
-              onChange={(e) => setField(ymd, "patients", e.target.value)}
-              aria-label={`${label(ymd)} 총 환자 수`}
-            />
-          ))}
-          {textRow("지원가능 진료과 (오전)", "amDepts")}
-          {textRow("지원가능 진료과 (오후)", "pmDepts")}
+          {row(
+            labels.patients,
+            (ymd, d) => (
+              <input
+                className={styles.cellInput}
+                type="number"
+                min="0"
+                value={d.patients}
+                onChange={(e) => setField(ymd, "patients", e.target.value)}
+                aria-label={`${label(ymd)} ${labels.patients}`}
+              />
+            ),
+            {
+              id: "patients",
+              labelNode: editableLabel(labels.patients, (v) =>
+                setLabel("patients", v)
+              ),
+            }
+          )}
+          {textRow("amDepts", "amDepts")}
+          {textRow("pmDepts", "pmDepts")}
 
           {range(MEETING_SLOTS).map((i) =>
             row(
-              "회의일정",
+              labels.meetings,
               (ymd, d) => {
                 const m = d.meetings[i];
                 const key = `${ymd}#${i}`;
@@ -316,15 +348,22 @@ export default function WeekSheet({
                 first: i === 0,
                 id: `meeting${i}`,
                 accent: "meeting",
+                labelNode: editableLabel(labels.meetings, (v) =>
+                  setLabel("meetings", v)
+                ),
               }
             )
           )}
 
-          {range(TODO_SLOTS).map((i) =>
+          {range(todoRows).map((i) =>
             row(
-              "오늘 할 일",
+              labels.todos,
               (ymd, d) => {
+                const shown = shownTodos(d);
+                // 이 날에 없는 칸은 비워 둔다.
+                if (i >= shown) return null;
                 const t = d.todos[i];
+                const isLast = i === shown - 1 && shown < TODO_SLOTS;
                 return (
                   <div className={styles.todoCell}>
                     <input
@@ -343,16 +382,34 @@ export default function WeekSheet({
                       }
                       aria-label={`${label(ymd)} 할 일 ${i + 1}`}
                     />
+                    {isLast && (
+                      <button
+                        type="button"
+                        className={styles.addTodo}
+                        onClick={() => setField(ymd, "todoCount", shown + 1)}
+                        aria-label={`${label(ymd)} 할 일 칸 추가`}
+                        title="할 일 칸 추가"
+                      >
+                        +
+                      </button>
+                    )}
                   </div>
                 );
               },
-              { span: TODO_SLOTS, first: i === 0, id: `todo${i}` }
+              {
+                span: todoRows,
+                first: i === 0,
+                id: `todo${i}`,
+                labelNode: editableLabel(labels.todos, (v) =>
+                  setLabel("todos", v)
+                ),
+              }
             )
           )}
 
           {range(INTERVIEW_SLOTS).map((i) =>
             row(
-              "면담",
+              labels.interviews,
               (ymd, d) => (
                 <div className={styles.todoCell}>
                   <input
@@ -377,12 +434,19 @@ export default function WeekSheet({
                   />
                 </div>
               ),
-              { span: INTERVIEW_SLOTS, first: i === 0, id: `interview${i}` }
+              {
+                span: INTERVIEW_SLOTS,
+                first: i === 0,
+                id: `interview${i}`,
+                labelNode: editableLabel(labels.interviews, (v) =>
+                  setLabel("interviews", v)
+                ),
+              }
             )
           )}
 
-          {textRow("팀장님 외부재", "leaderAbsent")}
-          {textRow("운영간호사 부재", "nurseAbsent")}
+          {textRow("leaderAbsent", "leaderAbsent")}
+          {textRow("nurseAbsent", "nurseAbsent")}
           {row(labels.helper, (ymd, d) => (
             <div className={styles.todoCell}>
               <input

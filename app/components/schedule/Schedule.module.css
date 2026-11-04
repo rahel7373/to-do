@@ -1441,3 +1441,38 @@
 .longAddBtn:hover {
   background: #9d731f;
 }
+
+/* 월간·분기·연간 맨 위 큰 제목 */
+.viewTitle {
+  margin: 0 0 10px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #8b99ae;
+  font-size: 1.9rem;
+  font-weight: 500;
+  color: #475569;
+  letter-spacing: -0.02em;
+}
+
+.viewTitle b {
+  font-weight: 800;
+  color: #1e293b;
+}
+
+.viewSub {
+  margin-left: 10px;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #64748b;
+}
+
+.recurGroup {
+  margin-bottom: 8px;
+}
+
+.recurGroupTitle {
+  margin: 8px 0 4px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #64748b;
+  letter-spacing: 0.02em;
+}

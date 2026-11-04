@@ -24,6 +24,10 @@ export default function YearView({ anchor, events, onPickMonth }) {
   const year = toLocalDate(anchor).getFullYear();
 
   return (
+    <>
+    <h2 className={styles.viewTitle}>
+      <b>{year}년</b> 연간 일정
+    </h2>
     <div className={styles.year}>
       {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => {
         const first = `${year}-${pad(m)}-01`;
@@ -75,5 +79,6 @@ export default function YearView({ anchor, events, onPickMonth }) {
         );
       })}
     </div>
+    </>
   );
 }

@@ -24,6 +24,10 @@ export default function MonthView({ anchor, events, onDelete, onPickDate }) {
   const days = Array.from({ length: daysInMonth(year, month) }, (_, i) => i + 1);
 
   return (
+    <>
+    <h2 className={styles.viewTitle}>
+      {year}년 <b>{month}월</b>
+    </h2>
     <div className={styles.month}>
       {WEEKDAYS.map((w, i) => (
         <div
@@ -69,5 +73,6 @@ export default function MonthView({ anchor, events, onDelete, onPickDate }) {
         );
       })}
     </div>
+    </>
   );
 }

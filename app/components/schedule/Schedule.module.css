@@ -580,11 +580,29 @@
   width: 100%;
   min-width: 0;
   padding: 3px 4px;
-  font-size: 0.8rem;
+  font: inherit;
+  font-size: 0.85rem;
   font-weight: 600;
-  border: 1px solid #93c5fd;
+  line-height: 1.3;
+  color: inherit;
+  resize: none;
+  overflow: hidden;
+  border: 1px solid transparent;
   border-radius: 4px;
+  background: transparent;
+  word-break: keep-all;
+  cursor: text;
+}
+
+.labelInput:hover {
+  border-color: #93c5fd;
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.labelInput:focus {
+  border-color: #2563eb;
   background: #fff;
+  outline: none;
 }
 
 .labelDelete {

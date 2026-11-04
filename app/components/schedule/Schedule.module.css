@@ -1058,3 +1058,244 @@
 .groupStart:first-child > td {
   border-top: none;
 }
+
+/* =====================================================================
+   고급스럽게 다듬기: 슬레이트 계열의 차분한 선, 부드러운 면, 둥근 모서리
+   (구획은 그대로 확실하게, 선은 얇고 색은 낮춘다)
+   ===================================================================== */
+.sheetWrap {
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05), 0 6px 18px rgba(15, 23, 42, 0.06);
+}
+
+.sheet {
+  border: none;
+  color: #1e293b;
+}
+
+.sheet th,
+.sheet td {
+  border-color: #edf0f5;
+}
+
+/* 요일 칸 사이: 얇지만 분명한 선 */
+.sheet .dayCell,
+.sheet .sheetHead {
+  border-left: 1px solid #b6c0cf;
+}
+
+.sheet .rowLabel {
+  border-right: 1px solid #b6c0cf;
+}
+
+/* 항목 묶음 사이 */
+.groupStart > th,
+.groupStart > td {
+  border-top: 1px solid #b6c0cf;
+}
+
+.groupStart:first-child > th,
+.groupStart:first-child > td {
+  border-top: none;
+}
+
+/* 머리글 */
+.sheet thead th {
+  border-bottom: 1px solid #94a3b8;
+}
+
+.sheet thead th.sheetHead {
+  background: #f8fafc;
+  color: #0f172a;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.sheet thead th:first-child {
+  background: #f1f5f9;
+}
+
+.sheet thead .todayCell {
+  background: #fff8e6;
+  box-shadow: inset 0 -3px 0 #f2b84b;
+}
+
+.sheet .todayCell {
+  background: #fffcf2;
+}
+
+/* 항목 이름 칸 */
+.sheet .rowLabel {
+  background: #f1f5f9;
+  color: #334155;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.sheet .labelInput {
+  color: #334155;
+}
+
+.sheet .labelInput:hover {
+  border-color: #cbd5e1;
+  background: #fff;
+}
+
+.sheet .labelInput:focus {
+  border-color: #64748b;
+  box-shadow: 0 0 0 2px rgba(100, 116, 139, 0.18);
+}
+
+/* 정기 업무: 부드러운 로즈 */
+.recurLabel {
+  background: #fbe8f0;
+  color: #9d174d;
+}
+
+.recurCell {
+  background: #fff8fb;
+}
+
+.recurItem {
+  background: #fdeef5;
+  border-left: 3px solid #e9a3c2;
+  border-radius: 5px;
+  color: #6b2145;
+}
+
+/* 입력칸 */
+.sheet .cellInput:hover {
+  border-color: #dbe2ec;
+  background: #fafbfd;
+}
+
+.sheet .cellInput:focus {
+  border-color: #64748b;
+  background: #fff;
+  box-shadow: 0 0 0 2px rgba(100, 116, 139, 0.18);
+}
+
+.sheet input[type="checkbox"] {
+  accent-color: #475569;
+}
+
+/* 회의 카드 */
+.meeting {
+  border: 1px solid #e2e8f0;
+  border-left: 3px solid #94a3b8;
+  border-radius: 7px;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+}
+
+.meeting.important {
+  border: 1px solid #f2c46d;
+  border-left: 3px solid #e0922a;
+  background: #fff7e0;
+}
+
+.addMeeting {
+  border: 1px dashed #cbd5e1;
+  border-radius: 6px;
+  color: #94a3b8;
+}
+
+.addMeeting:hover {
+  border-style: solid;
+  border-color: #94a3b8;
+  background: #f8fafc;
+  color: #475569;
+}
+
+.starOn {
+  color: #d9902b;
+}
+
+.repeatButton {
+  border-color: #cbd5e1;
+  border-radius: 999px;
+  color: #475569;
+}
+
+.repeatButton:hover:not(:disabled) {
+  background: #f1f5f9;
+}
+
+/* 작은 버튼 */
+.markButton {
+  border-color: #cbd5e1;
+  background: #fff;
+  color: #475569;
+}
+
+.addTodo {
+  border: 1px solid #cbd5e1;
+  background: #f8fafc;
+  color: #64748b;
+}
+
+.addTodo:hover {
+  background: #e2e8f0;
+  color: #1e293b;
+}
+
+/* 노란 오늘 칸이 열 구분선을 가리지 않도록 */
+.sheet td.holidayCol {
+  background: #fdeeee;
+}
+
+.sheet thead .holidayHead {
+  background: #d9534f;
+}
+
+.sheet thead .halfHead {
+  background: #e8a23a;
+}
+
+.sheet thead .leaveHead {
+  background: #3f9a6a;
+}
+
+.sheet thead .trainingHead {
+  background: #7c68c8;
+}
+
+/* 선 대비를 조금 올려 구획이 또렷하게 */
+.sheet .dayCell,
+.sheet .sheetHead {
+  border-left: 1px solid #9aa7ba;
+}
+
+.sheet .rowLabel {
+  border-right: 1px solid #9aa7ba;
+}
+
+.groupStart > th,
+.groupStart > td {
+  border-top: 1px solid #8b99ae;
+}
+
+.groupStart:first-child > th,
+.groupStart:first-child > td {
+  border-top: none;
+}
+
+/* border-collapse에서는 같은 굵기일 때 위·왼쪽 칸의 선이 이기므로,
+   진한 구분선은 양쪽 칸에 같은 색으로 주거나 안쪽 그림자로 그린다. */
+.sheet .dayCell,
+.sheet .sheetHead {
+  border-left: 1px solid #9aa7ba;
+  border-right: 1px solid #9aa7ba;
+}
+
+.groupStart > th,
+.groupStart > td {
+  box-shadow: inset 0 1px 0 #8b99ae;
+}
+
+.groupStart:first-child > th,
+.groupStart:first-child > td {
+  box-shadow: none;
+}

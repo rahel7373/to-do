@@ -8,11 +8,12 @@ import {
   toLocalDate,
   todayYMD,
 } from "../../lib/date";
-import { useLocalList } from "../../lib/useLocalList";
+import { getDay } from "../../lib/dayLog";
+import { useLocalList, useLocalState } from "../../lib/useLocalList";
 import EventForm from "./EventForm";
 import MonthView from "./MonthView";
 import QuarterView from "./QuarterView";
-import WeekView from "./WeekView";
+import WeekSheet from "./WeekSheet";
 import YearView from "./YearView";
 import styles from "./Schedule.module.css";
 
@@ -38,8 +39,11 @@ function rangeLabel(view, ymd) {
   return `${year}년`;
 }
 
+const EMPTY_DAYS = {};
+
 export default function ScheduleView({ view, onChangeView }) {
   const [events, setEvents, loaded] = useLocalList("events");
+  const [days, setDays, daysLoaded] = useLocalState("days", EMPTY_DAYS);
   // 오늘 날짜는 서버 렌더링 때 알 수 없으므로 마운트 후에 채운다.
   const [anchor, setAnchor] = useState("");
   const [formDate, setFormDate] = useState("");
@@ -50,13 +54,18 @@ export default function ScheduleView({ view, onChangeView }) {
     setFormDate(today);
   }, []);
 
-  const ready = loaded && anchor !== "";
+  const ready = loaded && daysLoaded && anchor !== "";
 
   function addEvent(data) {
     setEvents((prev) => [
       ...prev,
       { id: crypto.randomUUID(), createdAt: Date.now(), ...data },
     ]);
+  }
+
+  // 날짜별 업무 시트 수정: 저장된 값이 없으면 기본값에서 시작한다.
+  function changeDay(ymd, update) {
+    setDays((prev) => ({ ...prev, [ymd]: update(getDay(prev, ymd)) }));
   }
 
   function deleteEvent(id) {
@@ -114,7 +123,13 @@ export default function ScheduleView({ view, onChangeView }) {
       </div>
 
       {ready && view === "week" && (
-        <WeekView anchor={anchor} events={events} onDelete={deleteEvent} />
+        <WeekSheet
+          anchor={anchor}
+          events={events}
+          days={days}
+          onDeleteEvent={deleteEvent}
+          onChangeDay={changeDay}
+        />
       )}
       {ready && view === "month" && (
         <MonthView

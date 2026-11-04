@@ -5,7 +5,7 @@ import { EVENT_TYPES, toMinutes } from "../../lib/schedule";
 import styles from "./Schedule.module.css";
 
 export default function EventForm({ defaultDate, onAdd }) {
-  const [type, setType] = useState("work");
+  const [type, setType] = useState("");
   const [title, setTitle] = useState("");
   const [startDate, setStartDate] = useState(defaultDate);
   const [endDate, setEndDate] = useState("");
@@ -20,6 +20,7 @@ export default function EventForm({ defaultDate, onAdd }) {
 
   function handleSubmit(e) {
     e.preventDefault();
+    if (!type) return;
     const label = EVENT_TYPES[type].label;
     const trimmed = title.trim();
     if (type === "work" && !trimmed) return setError("업무 내용을 입력하세요.");
@@ -49,6 +50,7 @@ export default function EventForm({ defaultDate, onAdd }) {
     setStartTime("");
     setEndTime("");
     setError("");
+    setType(""); // 다시 접어 공간을 아낀다
   }
 
   const hasTime = !!(startTime || endTime);
@@ -61,12 +63,15 @@ export default function EventForm({ defaultDate, onAdd }) {
         onChange={(e) => setType(e.target.value)}
         aria-label="종류"
       >
+        <option value="">종류 선택</option>
         {Object.entries(EVENT_TYPES).map(([key, { label }]) => (
           <option key={key} value={key}>
             {label}
           </option>
         ))}
       </select>
+      {type && (
+        <>
       <input
         className={`${styles.field} ${styles.titleField}`}
         value={title}
@@ -119,6 +124,8 @@ export default function EventForm({ defaultDate, onAdd }) {
       <button className={styles.addButton} type="submit">
         추가
       </button>
+        </>
+      )}
       {error && (
         <p className={styles.error} role="alert">
           {error}

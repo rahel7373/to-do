@@ -902,6 +902,10 @@
   font-size: 0.8rem;
 }
 
+.sheet .rowLabel {
+  width: 150px;
+}
+
 @media (max-width: 900px) {
   .layout {
     grid-template-columns: 1fr;

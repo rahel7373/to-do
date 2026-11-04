@@ -127,7 +127,6 @@ export default function ScheduleView({ view, onChangeView }) {
           anchor={anchor}
           events={events}
           days={days}
-          onDeleteEvent={deleteEvent}
           onChangeDay={changeDay}
         />
       )}

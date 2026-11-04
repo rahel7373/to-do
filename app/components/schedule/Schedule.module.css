@@ -191,6 +191,28 @@
   background: #fffbeb;
 }
 
+/* 휴일: 머리글은 진한 빨강, 열 전체는 연한 빨강 */
+.holidayHead {
+  background: #dc2626;
+  color: #fff;
+}
+
+.holidayCol {
+  background: #fee2e2;
+}
+
+/* 노조설립일처럼 오전만 근무하는 날 */
+.halfHead {
+  background: #f59e0b;
+  color: #fff;
+}
+
+.holidayName {
+  margin-top: 2px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
 .cellInput {
   width: 100%;
   min-width: 0;

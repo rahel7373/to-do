@@ -10,18 +10,43 @@ import {
   TODO_SLOTS,
   getDay,
 } from "../../lib/dayLog";
-import { eventsOn, sortAllDay } from "../../lib/schedule";
-import EventChip from "./EventChip";
+import { holidayOf } from "../../lib/holidays";
+import { eventsOn } from "../../lib/schedule";
 import styles from "./Schedule.module.css";
 
 const range = (n) => Array.from({ length: n }, (_, i) => i);
 
+// 그날의 휴일 정보: 내장 휴일 + 직접 등록한 '휴일'.
+// kind "off" = 종일 휴일, "half" = 오전 근무만.
+function holidayInfo(ymd, events) {
+  const builtin = holidayOf(ymd);
+  const own = eventsOn(events, ymd)
+    .filter((e) => e.type === "holiday")
+    .map((e) => e.title);
+  const names = [
+    ...(builtin?.kind === "off" ? [builtin.name] : []),
+    ...own,
+  ].filter((n, i, all) => all.indexOf(n) === i);
+  if (names.length) return { kind: "off", name: names.join(" · ") };
+  return builtin;
+}
+
 // 주간 시트: 월~금 열마다 그날의 업무 항목을 한 장에 모아 둔다.
-export default function WeekSheet({ anchor, events, days, onDeleteEvent, onChangeDay }) {
+export default function WeekSheet({ anchor, events, days, onChangeDay }) {
   const monday = startOfWeek(anchor);
   const dates = range(5).map((i) => addDays(monday, i));
   const today = todayYMD();
   const dayOf = (ymd) => getDay(days, ymd);
+  const holidays = Object.fromEntries(
+    dates.map((ymd) => [ymd, holidayInfo(ymd, events)])
+  );
+  // 휴일은 열 전체를 빨갛게, 오늘은 노랗게 칠한다.
+  const colClass = (ymd) =>
+    holidays[ymd]?.kind === "off"
+      ? styles.holidayCol
+      : ymd === today
+        ? styles.todayCell
+        : "";
 
   const setField = (ymd, key, value) =>
     onChangeDay(ymd, (d) => ({ ...d, [key]: value }));
@@ -49,7 +74,7 @@ export default function WeekSheet({ anchor, events, days, onDeleteEvent, onChang
         </th>
       )}
       {dates.map((ymd) => (
-        <td key={ymd} className={ymd === today ? styles.todayCell : ""}>
+        <td key={ymd} className={colClass(ymd)}>
           {render(ymd, dayOf(ymd))}
         </td>
       ))}
@@ -72,24 +97,35 @@ export default function WeekSheet({ anchor, events, days, onDeleteEvent, onChang
         <thead>
           <tr>
             <th className={styles.rowLabel} />
-            {dates.map((ymd, i) => (
-              <th
-                key={ymd}
-                scope="col"
-                className={`${styles.sheetHead} ${ymd === today ? styles.todayCell : ""}`}
-              >
-                {label(ymd)} ({WEEKDAYS[i]})
-              </th>
-            ))}
+            {dates.map((ymd, i) => {
+              const h = holidays[ymd];
+              const headClass =
+                h?.kind === "off"
+                  ? styles.holidayHead
+                  : h?.kind === "half"
+                    ? styles.halfHead
+                    : ymd === today
+                      ? styles.todayCell
+                      : "";
+              return (
+                <th
+                  key={ymd}
+                  scope="col"
+                  className={`${styles.sheetHead} ${headClass}`}
+                >
+                  {label(ymd)} ({WEEKDAYS[i]})
+                  {h && (
+                    <div className={styles.holidayName}>
+                      {h.name}
+                      {h.kind === "half" && " · 오전 근무"}
+                    </div>
+                  )}
+                </th>
+              );
+            })}
           </tr>
         </thead>
         <tbody>
-          {row("휴일·휴가·일정", (ymd) =>
-            sortAllDay(eventsOn(events, ymd)).map((ev) => (
-              <EventChip key={ev.id} ev={ev} onDelete={onDeleteEvent} showTime />
-            ))
-          )}
-
           {row("총 환자 수", (ymd, d) => (
             <input
               className={styles.cellInput}
@@ -146,6 +182,15 @@ export default function WeekSheet({ anchor, events, days, onDeleteEvent, onChang
                         aria-label={`${label(ymd)} 회의 ${i + 1} 장소 직접 입력`}
                       />
                     )}
+                    <input
+                      className={styles.cellInput}
+                      value={m.title}
+                      placeholder="회의 제목"
+                      onChange={(e) =>
+                        setItem(ymd, "meetings", i, { title: e.target.value })
+                      }
+                      aria-label={`${label(ymd)} 회의 ${i + 1} 제목`}
+                    />
                   </div>
                 );
               },

@@ -1312,3 +1312,132 @@
   font-size: 0.78rem;
   line-height: 1.3;
 }
+
+/* 장기 중요 업무 박스 (왼쪽 열 아래) */
+.longBox {
+  margin-top: 12px;
+  padding: 9px 8px 8px;
+  border: 1.5px solid #c9a24a;
+  border-top: 4px solid #b8892b;
+  border-radius: 10px;
+  background: linear-gradient(#fffaf0, #fffdf8);
+  box-shadow: 0 3px 10px rgba(184, 137, 43, 0.18);
+}
+
+.longTitle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0 0 6px;
+  font-size: 0.86rem;
+  color: #7a5a14;
+}
+
+.longCount {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #7a5a14;
+  background: #f6e6bd;
+  border-radius: 999px;
+  padding: 1px 7px;
+}
+
+.longList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 5px;
+}
+
+.longItem {
+  padding: 5px 6px;
+  border: 1px solid #ecdcb4;
+  border-radius: 7px;
+  background: #fff;
+}
+
+.longRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.longRow input[type="checkbox"] {
+  margin: 2px 0 0;
+  accent-color: #b8892b;
+}
+
+.longText,
+.longDone {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.8rem;
+  font-weight: 600;
+  line-height: 1.3;
+  color: #3b2f12;
+  overflow-wrap: anywhere;
+}
+
+.longDone {
+  color: #9a9a9a;
+  font-weight: 400;
+  text-decoration: line-through;
+}
+
+.longBtn {
+  flex: none;
+  padding: 0 2px;
+  border: none;
+  background: none;
+  font-size: 0.72rem;
+  line-height: 1.3;
+  color: #8a7a52;
+  cursor: pointer;
+}
+
+.longBtn:hover {
+  color: #3b2f12;
+}
+
+.longMemo {
+  display: block;
+  width: 100%;
+  margin-top: 4px;
+  padding: 4px 5px;
+  border: 1px solid #ecdcb4;
+  border-radius: 6px;
+  background: #fffdf6;
+  font: inherit;
+  font-size: 0.76rem;
+  resize: vertical;
+}
+
+.longAdd {
+  display: grid;
+  gap: 4px;
+  margin-top: 7px;
+}
+
+.longInput {
+  width: 100%;
+  min-width: 0;
+  padding: 5px 6px;
+  border: 1px solid #ecdcb4;
+  border-radius: 6px;
+  font-size: 0.78rem;
+}
+
+.longAddBtn {
+  padding: 4px 6px;
+  border: 1px solid #b8892b;
+  border-radius: 6px;
+  background: #b8892b;
+  color: #fff;
+  font-size: 0.78rem;
+  cursor: pointer;
+}
+
+.longAddBtn:hover {
+  background: #9d731f;
+}

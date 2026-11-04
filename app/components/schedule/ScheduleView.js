@@ -47,7 +47,7 @@ function rangeLabel(view, ymd) {
 
 const EMPTY_DAYS = {};
 
-export default function ScheduleView({ view, onChangeView }) {
+export default function ScheduleView({ view, onChangeView, top }) {
   const [events, setEvents, loaded] = useLocalList("events");
   const [days, setDays, daysLoaded] = useLocalState("days", EMPTY_DAYS);
   const [rules, setRules, rulesLoaded] = useLocalState(
@@ -102,8 +102,10 @@ export default function ScheduleView({ view, onChangeView }) {
   }
 
   return (
-    <section>
-      <EventForm defaultDate={formDate} onAdd={addEvent} />
+    <section className={styles.layout}>
+      <aside className={styles.sidebar}>
+        {top}
+        <EventForm defaultDate={formDate} onAdd={addEvent} />
 
       <div className={styles.nav}>
         <button
@@ -140,7 +142,9 @@ export default function ScheduleView({ view, onChangeView }) {
           <i className={`${styles.dot} ${styles.leave}`} /> 휴가
         </span>
       </div>
+      </aside>
 
+      <div className={styles.content}>
       {ready && view === "week" && (
         <WeekSheet
           anchor={anchor}
@@ -170,6 +174,7 @@ export default function ScheduleView({ view, onChangeView }) {
       {ready && view === "year" && (
         <YearView anchor={anchor} events={events} onPickMonth={pickMonth} />
       )}
+      </div>
     </section>
   );
 }

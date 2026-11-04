@@ -85,6 +85,7 @@ export function defaultDay(ymd) {
       narcotics: false,
     },
     narcoticsSign: "",
+    recurDone: {}, // 정기 업무 완료 여부 { 업무id: true }
   };
 }
 

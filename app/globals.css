@@ -42,3 +42,22 @@ body {
   border-bottom-color: #2563eb;
   font-weight: 600;
 }
+
+/* 일정 화면: 가로 전체를 쓰고 왼쪽에 조작 열을 둔다 */
+.scheduleMain {
+  padding: 12px;
+}
+
+.appTitle {
+  margin: 0 0 8px;
+  font-size: 1.4rem;
+}
+
+.tabsCompact {
+  margin-bottom: 10px;
+}
+
+.tabsCompact .tab {
+  padding: 5px 9px;
+  font-size: 0.85rem;
+}

@@ -13,6 +13,7 @@ import {
   getDay,
 } from "../../lib/dayLog";
 import { holidayOf } from "../../lib/holidays";
+import { recurringOn } from "../../lib/recurring";
 import { eventsOn } from "../../lib/schedule";
 import styles from "./Schedule.module.css";
 
@@ -37,6 +38,8 @@ function holidayInfo(ymd, events) {
 export default function WeekSheet({ anchor, events, days, onChangeDay }) {
   // 수동 표시(휴가·외부 교육 등)를 편집 중인 날짜
   const [editing, setEditing] = useState("");
+  // 비어 있는 회의 칸 중 펼쳐 둔 칸 ("날짜#칸번호")
+  const [openSlots, setOpenSlots] = useState({});
   const monday = startOfWeek(anchor);
   const dates = range(5).map((i) => addDays(monday, i));
   const today = todayYMD();
@@ -74,15 +77,26 @@ export default function WeekSheet({ anchor, events, days, onChangeDay }) {
   const label = (ymd) => `${ymd.slice(5).replace("-", "/")}`;
 
   // 한 행: 왼쪽 라벨 + 날짜별 칸
-  const row = (title, render, { span, first = true, id = title } = {}) => (
+  const row = (
+    title,
+    render,
+    { span, first = true, id = title, accent = "" } = {}
+  ) => (
     <tr key={id}>
       {first && (
-        <th scope="row" className={styles.rowLabel} rowSpan={span}>
+        <th
+          scope="row"
+          className={`${styles.rowLabel} ${accent ? styles[`${accent}Label`] : ""}`}
+          rowSpan={span}
+        >
           {title}
         </th>
       )}
       {dates.map((ymd) => (
-        <td key={ymd} className={colClass(ymd)}>
+        <td
+          key={ymd}
+          className={colClass(ymd) || (accent ? styles[`${accent}Cell`] : "")}
+        >
           {render(ymd, dayOf(ymd))}
         </td>
       ))}
@@ -208,6 +222,23 @@ export default function WeekSheet({ anchor, events, days, onChangeDay }) {
               "회의일정",
               (ymd, d) => {
                 const m = d.meetings[i];
+                const key = `${ymd}#${i}`;
+                const empty =
+                  !m.time && !m.place && !m.title && !m.custom && !m.important;
+                if (empty && !openSlots[key]) {
+                  return (
+                    <button
+                      type="button"
+                      className={styles.addMeeting}
+                      onClick={() =>
+                        setOpenSlots((s) => ({ ...s, [key]: true }))
+                      }
+                      aria-label={`${label(ymd)} 회의 ${i + 1} 추가`}
+                    >
+                      + 회의
+                    </button>
+                  );
+                }
                 return (
                   <div
                     className={`${styles.meeting} ${m.important ? styles.important : ""}`}
@@ -236,6 +267,19 @@ export default function WeekSheet({ anchor, events, days, onChangeDay }) {
                       >
                         {m.important ? "★" : "☆"}
                       </button>
+                      {empty && (
+                        <button
+                          type="button"
+                          className={styles.star}
+                          onClick={() =>
+                            setOpenSlots((s) => ({ ...s, [key]: false }))
+                          }
+                          aria-label={`${label(ymd)} 회의 ${i + 1} 접기`}
+                          title="접기"
+                        >
+                          ✕
+                        </button>
+                      )}
                     </div>
                     <select
                       className={styles.cellInput}
@@ -276,7 +320,12 @@ export default function WeekSheet({ anchor, events, days, onChangeDay }) {
                   </div>
                 );
               },
-              { span: MEETING_SLOTS, first: i === 0, id: `meeting${i}` }
+              {
+                span: MEETING_SLOTS,
+                first: i === 0,
+                id: `meeting${i}`,
+                accent: "meeting",
+              }
             )
           )}
 
@@ -342,6 +391,35 @@ export default function WeekSheet({ anchor, events, days, onChangeDay }) {
               </label>
             ))
           )}
+
+          {row("정기 업무", (ymd, d) => (
+            <div className={styles.recurList}>
+              {recurringOn(ymd).map((r) => {
+                const done = !!d.recurDone?.[r.id];
+                return (
+                  <label key={r.id} className={styles.recurItem}>
+                    <input
+                      type="checkbox"
+                      checked={done}
+                      onChange={(e) =>
+                        onChangeDay(ymd, (x) => ({
+                          ...x,
+                          recurDone: {
+                            ...x.recurDone,
+                            [r.id]: e.target.checked,
+                          },
+                        }))
+                      }
+                      aria-label={`${label(ymd)} ${r.label}`}
+                    />
+                    <span className={done ? styles.doneText : ""}>
+                      {r.label}
+                    </span>
+                  </label>
+                );
+              })}
+            </div>
+          ), { accent: "recur" })}
 
           {row("마약류 사인", (ymd, d) => (
             <div className={styles.todoCell}>

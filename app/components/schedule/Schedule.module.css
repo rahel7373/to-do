@@ -490,3 +490,73 @@
 .important .cellInput {
   font-weight: 700;
 }
+
+/* 회의일정 줄 강조: 파란 계열 */
+.meetingLabel {
+  background: #1d4ed8;
+  color: #fff;
+}
+
+.meetingCell {
+  background: #eff6ff;
+}
+
+.addMeeting {
+  width: 100%;
+  padding: 3px 0;
+  border: 1px dashed #93c5fd;
+  border-radius: 4px;
+  background: transparent;
+  color: #3b82f6;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.addMeeting:hover {
+  background: #dbeafe;
+  border-style: solid;
+}
+
+/* 내용이 있는 회의 칸 */
+.meeting {
+  padding: 2px;
+  border-left: 4px solid #2563eb;
+  border-radius: 4px;
+  background: #fff;
+}
+
+.meeting.important {
+  padding: 2px;
+  border: 2px solid #f59e0b;
+  background: #fef3c7;
+}
+
+/* 정기 업무 */
+.recurList {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-height: 24px;
+}
+
+.recurItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 3px 6px;
+  border-radius: 4px;
+  background: #fce7f3;
+  border-left: 4px solid #f472b6;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+/* 정기 업무 줄: 연한 핑크 */
+.recurLabel {
+  background: #fbcfe8;
+  color: #831843;
+}
+
+.recurCell {
+  background: #fdf2f8;
+}

@@ -987,3 +987,74 @@
 .meeting.important {
   border-left-color: #f59e0b;
 }
+
+/* ===== 구획 구분: 요일 칸 사이와 항목 묶음 사이를 굵은 선으로 ===== */
+.sheet {
+  border: 2px solid #475569;
+}
+
+.sheet th,
+.sheet td {
+  border-color: #d1d5db;
+}
+
+/* 월~금 열 사이 */
+.sheet .dayCell,
+.sheet .sheetHead {
+  border-left: 2px solid #64748b;
+}
+
+/* 항목 이름 칸과 요일 칸 사이 */
+.sheet .rowLabel {
+  border-right: 2px solid #475569;
+}
+
+/* 머리글(날짜) 아래 */
+.sheet thead th {
+  border-bottom: 2px solid #475569;
+}
+
+/* 항목 묶음(총 환자 수, 진료과, 회의, 할 일, 면담 …) 사이 */
+.groupStart > th,
+.groupStart > td {
+  border-top: 2px solid #64748b;
+}
+
+.groupStart:first-child > th,
+.groupStart:first-child > td {
+  border-top: none;
+}
+
+/* 더 확실하게: 요일 칸 사이는 3px, 묶음 사이는 2px 진한 선 */
+.sheet .dayCell,
+.sheet .sheetHead {
+  border-left: 3px solid #334155;
+}
+
+.sheet .rowLabel {
+  border-right: 3px solid #334155;
+}
+
+.sheet thead th {
+  border-bottom: 3px solid #334155;
+}
+
+.groupStart > th,
+.groupStart > td {
+  border-top: 2px solid #334155;
+}
+
+.groupStart:first-child > th,
+.groupStart:first-child > td {
+  border-top: none;
+}
+
+.groupStart > th,
+.groupStart > td {
+  border-top: 3px solid #334155;
+}
+
+.groupStart:first-child > th,
+.groupStart:first-child > td {
+  border-top: none;
+}

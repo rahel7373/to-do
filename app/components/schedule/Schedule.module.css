@@ -956,3 +956,34 @@
 .sidebar .dot {
   margin: 0 2px 0 4px;
 }
+
+/* 회의일정 줄은 파란색 대신 무채색 */
+.meeting {
+  border-left-color: #9ca3af;
+}
+
+.addMeeting {
+  border-color: #d1d5db;
+  color: #6b7280;
+}
+
+.addMeeting:hover {
+  background: #f3f4f6;
+}
+
+.repeatButton {
+  border-color: #d1d5db;
+  color: #4b5563;
+}
+
+.repeatInfo {
+  color: #4b5563;
+}
+
+.repeatEditor {
+  border-color: #d1d5db;
+}
+
+.meeting.important {
+  border-left-color: #f59e0b;
+}

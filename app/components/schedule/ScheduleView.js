@@ -62,6 +62,8 @@ export default function ScheduleView({ view, onChangeView, top }) {
   // 오늘 날짜는 서버 렌더링 때 알 수 없으므로 마운트 후에 채운다.
   const [anchor, setAnchor] = useState("");
   const [formDate, setFormDate] = useState("");
+  // 확인사항 칸(차주 헬퍼 이하) 항목 추가·삭제 모드
+  const [editItems, setEditItems] = useState(false);
 
   useEffect(() => {
     const today = todayYMD();
@@ -142,6 +144,25 @@ export default function ScheduleView({ view, onChangeView, top }) {
           <i className={`${styles.dot} ${styles.leave}`} /> 휴가
         </span>
       </div>
+
+      {view === "week" && (
+        <div className={styles.sideTools}>
+          <button
+            type="button"
+            className={styles.navButton}
+            onClick={() => setEditItems((on) => !on)}
+            aria-pressed={editItems}
+          >
+            {editItems ? "항목 편집 끝내기" : "확인사항 항목 편집"}
+          </button>
+          {editItems && (
+            <p className={styles.muted}>
+              차주 헬퍼 아래 확인 항목을 더하고 뺄 수 있어요. 이름은 편집 모드가
+              아니어도 줄 이름을 눌러 바로 바꿀 수 있어요.
+            </p>
+          )}
+        </div>
+      )}
       </aside>
 
       <div className={styles.content}>
@@ -157,6 +178,7 @@ export default function ScheduleView({ view, onChangeView, top }) {
           onDeleteRule={(id) =>
             setRules((prev) => prev.filter((r) => r.id !== id))
           }
+          editItems={editItems}
           onChangeConfig={(update) => setConfig((prev) => update(getConfig(prev)))}
         />
       )}

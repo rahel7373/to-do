@@ -363,13 +363,28 @@ export default function WeekSheet({ anchor, events, days, onChangeDay }) {
             row(
               "면담",
               (ymd, d) => (
-                <input
-                  className={styles.cellInput}
-                  value={d.interviews[i]}
-                  placeholder="이름"
-                  onChange={(e) => setInterview(ymd, i, e.target.value)}
-                  aria-label={`${label(ymd)} 면담 ${i + 1}`}
-                />
+                <div className={styles.todoCell}>
+                  <input
+                    type="checkbox"
+                    checked={!!d.interviewDone[i]}
+                    onChange={(e) =>
+                      onChangeDay(ymd, (x) => ({
+                        ...x,
+                        interviewDone: x.interviewDone.map((v, j) =>
+                          j === i ? e.target.checked : v
+                        ),
+                      }))
+                    }
+                    aria-label={`${label(ymd)} 면담 ${i + 1} 완료`}
+                  />
+                  <input
+                    className={`${styles.cellInput} ${d.interviewDone[i] ? styles.doneText : ""}`}
+                    value={d.interviews[i]}
+                    placeholder="이름"
+                    onChange={(e) => setInterview(ymd, i, e.target.value)}
+                    aria-label={`${label(ymd)} 면담 ${i + 1}`}
+                  />
+                </div>
               ),
               { span: INTERVIEW_SLOTS, first: i === 0, id: `interview${i}` }
             )
@@ -377,7 +392,22 @@ export default function WeekSheet({ anchor, events, days, onChangeDay }) {
 
           {textRow("팀장님 외부재", "leaderAbsent")}
           {textRow("운영간호사 부재", "nurseAbsent")}
-          {textRow("차주 헬퍼", "helper")}
+          {row("차주 헬퍼", (ymd, d) => (
+            <div className={styles.todoCell}>
+              <input
+                type="checkbox"
+                checked={!!d.helperDone}
+                onChange={(e) => setField(ymd, "helperDone", e.target.checked)}
+                aria-label={`${label(ymd)} 차주 헬퍼 완료`}
+              />
+              <input
+                className={`${styles.cellInput} ${d.helperDone ? styles.doneText : ""}`}
+                value={d.helper}
+                onChange={(e) => setField(ymd, "helper", e.target.value)}
+                aria-label={`${label(ymd)} 차주 헬퍼`}
+              />
+            </div>
+          ))}
 
           {CHECK_ITEMS.map(([key, title]) =>
             row(title, (ymd, d) => (

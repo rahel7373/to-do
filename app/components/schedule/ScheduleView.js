@@ -17,6 +17,7 @@ import {
 } from "../../lib/dayLog";
 import { useLocalList, useLocalState } from "../../lib/useLocalList";
 import EventForm from "./EventForm";
+import LongTermTasks from "./LongTermTasks";
 import MonthView from "./MonthView";
 import QuarterView from "./QuarterView";
 import WeekSheet from "./WeekSheet";
@@ -163,6 +164,7 @@ export default function ScheduleView({ view, onChangeView, top }) {
           )}
         </div>
       )}
+      <LongTermTasks />
       </aside>
 
       <div className={styles.content}>

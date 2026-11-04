@@ -148,19 +148,27 @@ export default function WeekSheet({
       checkItems: c.checkItems.filter((it) => it.id !== item.id),
     }));
   };
-  // 편집 모드에서는 라벨이 입력칸이 된다.
-  const editableLabel = (value, onChange, extra = null) =>
-    editItems ? (
-      <div className={styles.labelEdit}>
-        <input
-          className={styles.labelInput}
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          aria-label={`항목 이름 ${value}`}
-        />
-        {extra}
-      </div>
-    ) : null;
+  // 라벨을 눌러 바로 고칠 수 있다. 삭제 버튼은 편집 모드에서만 보인다.
+  const editableLabel = (value, onChange, extra = null) => (
+    <div className={styles.labelEdit}>
+      <textarea
+        className={styles.labelInput}
+        value={value}
+        rows={1}
+        ref={(el) => {
+          // 글자 수에 맞게 높이를 늘린다.
+          if (el) {
+            el.style.height = "auto";
+            el.style.height = `${el.scrollHeight}px`;
+          }
+        }}
+        onChange={(e) => onChange(e.target.value.replace(/\n/g, ""))}
+        aria-label={`항목 이름 ${value}`}
+        title="눌러서 이름 바꾸기"
+      />
+      {editItems && extra}
+    </div>
+  );
 
   return (
     <div className={styles.sheetWrap}>
@@ -175,7 +183,7 @@ export default function WeekSheet({
         </button>
         {editItems && (
           <span className={styles.muted}>
-            차주 헬퍼 아래 칸의 이름을 바꾸거나 항목을 더하고 뺄 수 있어요.
+            항목을 더하고 뺄 수 있어요. 이름은 편집 모드가 아니어도 눌러서 바로 바꿀 수 있어요.
           </span>
         )}
       </div>

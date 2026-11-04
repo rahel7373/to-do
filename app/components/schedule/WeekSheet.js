@@ -239,7 +239,19 @@ export default function WeekSheet({
                   scope="col"
                   className={`${styles.sheetHead} ${headClass}`}
                 >
-                  {label(ymd)} ({WEEKDAYS[i]})
+                  <div className={styles.headLine}>
+                    <span>
+                      {label(ymd)} ({WEEKDAYS[i]})
+                    </span>
+                    <button
+                      type="button"
+                      className={styles.markButton}
+                      onClick={() => setEditing(editing === ymd ? "" : ymd)}
+                      aria-label={`${label(ymd)} 휴가·교육 표시`}
+                    >
+                      {mark ? "표시 수정" : "+ 휴가·교육"}
+                    </button>
+                  </div>
                   {h && (
                     <div className={styles.holidayName}>
                       {h.name}
@@ -249,14 +261,6 @@ export default function WeekSheet({
                   {mark && (
                     <div className={styles.holidayName}>{markLabel}</div>
                   )}
-                  <button
-                    type="button"
-                    className={styles.markButton}
-                    onClick={() => setEditing(editing === ymd ? "" : ymd)}
-                    aria-label={`${label(ymd)} 휴가·교육 표시`}
-                  >
-                    {mark ? "표시 수정" : "+ 휴가·교육"}
-                  </button>
                   {editing === ymd && (
                     <div className={styles.markEditor}>
                       <select

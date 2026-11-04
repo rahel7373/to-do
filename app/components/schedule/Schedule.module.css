@@ -408,3 +408,85 @@
   outline: 2px solid #2563eb;
   outline-offset: 2px;
 }
+
+/* 수동 표시: 휴가(초록), 외부 교육(보라), 기타 휴무(빨강) */
+.leaveHead {
+  background: #16a34a;
+  color: #fff;
+}
+.leaveCol {
+  background: #dcfce7;
+}
+.trainingHead {
+  background: #7c3aed;
+  color: #fff;
+}
+.trainingCol {
+  background: #ede9fe;
+}
+.offHead {
+  background: #dc2626;
+  color: #fff;
+}
+.offCol {
+  background: #fee2e2;
+}
+
+.markButton {
+  display: block;
+  margin: 4px auto 0;
+  padding: 1px 8px;
+  font-size: 0.7rem;
+  border: 1px solid rgba(0, 0, 0, 0.25);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.85);
+  color: #444;
+  cursor: pointer;
+}
+
+.markEditor {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 4px;
+}
+
+.markEditor .cellInput {
+  border-color: #ddd;
+  background: #fff;
+  color: #222;
+}
+
+/* 회의 중요 일정 강조 */
+.meetingTop {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.star {
+  flex: none;
+  padding: 0 4px;
+  border: none;
+  background: none;
+  color: #aaa;
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.starOn {
+  color: #f59e0b;
+}
+
+.important {
+  padding: 2px;
+  border: 2px solid #f59e0b;
+  border-radius: 6px;
+  background: #fef3c7;
+  font-weight: 700;
+}
+
+.important .cellInput {
+  font-weight: 700;
+}

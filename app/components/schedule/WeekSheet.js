@@ -109,7 +109,7 @@ export default function WeekSheet({
     render,
     { span, first = true, id = title, accent = "", labelNode = null } = {}
   ) => (
-    <tr key={id}>
+    <tr key={id} className={first ? styles.groupStart : ""}>
       {first && (
         <th
           scope="row"
@@ -122,7 +122,7 @@ export default function WeekSheet({
       {dates.map((ymd) => (
         <td
           key={ymd}
-          className={colClass(ymd) || (accent ? styles[`${accent}Cell`] : "")}
+          className={`${styles.dayCell} ${colClass(ymd) || (accent ? styles[`${accent}Cell`] : "")}`}
         >
           {render(ymd, dayOf(ymd))}
         </td>

@@ -23,6 +23,7 @@ export const MARK_KINDS = [
 
 export const MEETING_SLOTS = 4;
 export const TODO_SLOTS = 8;
+export const TODO_DEFAULT_SHOWN = 4; // 처음에 보이는 할 일 칸 수
 export const INTERVIEW_SLOTS = 2;
 
 // 완료 여부만 체크하는 업무 (key, 라벨)
@@ -138,6 +139,7 @@ export function defaultDay(ymd, rules = []) {
     amDepts: "",
     pmDepts: "",
     meetings: defaultMeetings(ymd, rules),
+    todoCount: TODO_DEFAULT_SHOWN, // 보이는 할 일 칸 수 (늘릴 수 있음)
     todos: range(TODO_SLOTS, () => ({ text: "", done: false })),
     interviews: range(INTERVIEW_SLOTS, () => ""),
     interviewDone: range(INTERVIEW_SLOTS, () => false),
@@ -196,7 +198,19 @@ export function packDay(day, ymd, rules = []) {
 
 // 확인사항 칸 설정: 이름을 바꾸거나 항목을 더하고 뺄 수 있다.
 export const DEFAULT_SHEET_CONFIG = {
-  labels: { helper: "차주 헬퍼", recur: "정기 업무", narcotics: "마약류 사인" },
+  labels: {
+    patients: "총 환자 수",
+    amDepts: "지원가능 진료과 (오전)",
+    pmDepts: "지원가능 진료과 (오후)",
+    meetings: "회의일정",
+    todos: "오늘 할 일",
+    interviews: "면담",
+    leaderAbsent: "팀장님 외부재",
+    nurseAbsent: "운영간호사 부재",
+    helper: "차주 헬퍼",
+    recur: "정기 업무",
+    narcotics: "마약류 사인",
+  },
   checkItems: CHECK_ITEMS.map(([id, label]) => ({ id, label })),
 };
 

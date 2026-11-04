@@ -38,7 +38,7 @@ export default function MeetingCell({
         onClick={() => onOpen(true)}
         aria-label={`${name} 추가`}
       >
-        + 회의
+        +
       </button>
     );
   }

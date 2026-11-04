@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import { addDays, startOfWeek, todayYMD, WEEKDAYS } from "../../lib/date";
 import {
   INTERVIEW_SLOTS,
@@ -46,6 +46,23 @@ export default function WeekSheet({
 }) {
   // 확인사항 칸(차주 헬퍼 이하) 이름·항목 편집 모드
   const [editItems, setEditItems] = useState(false);
+  const wrapRef = useRef(null);
+
+  // 노트북 화면 한 장에 들어오도록 시트 크기를 화면 높이에 맞춘다 (최소 60%).
+  useLayoutEffect(() => {
+    const el = wrapRef.current;
+    if (!el) return;
+    const fit = () => {
+      el.style.zoom = "1";
+      const natural = el.getBoundingClientRect().height;
+      const room = window.innerHeight - 44;
+      const scale = Math.max(0.6, Math.min(1, room / natural));
+      el.style.zoom = String(scale);
+    };
+    fit();
+    window.addEventListener("resize", fit);
+    return () => window.removeEventListener("resize", fit);
+  });
   // 수동 표시(휴가·외부 교육 등)를 편집 중인 날짜
   const [editing, setEditing] = useState("");
   // 비어 있는 회의 칸 중 펼쳐 둔 칸 ("날짜#칸번호")
@@ -171,7 +188,7 @@ export default function WeekSheet({
   );
 
   return (
-    <div className={styles.sheetWrap}>
+    <div className={styles.sheetWrap} ref={wrapRef}>
       <div className={styles.sheetTools}>
         <button
           type="button"

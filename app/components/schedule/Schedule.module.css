@@ -881,3 +881,29 @@
 .sheet .sheetHead {
   font-size: 0.92rem;
 }
+
+/* 왼쪽 열은 좁게, 줄 이름(항목) 칸은 넓게 */
+.layout {
+  grid-template-columns: 200px minmax(0, 1fr);
+}
+
+.sidebar .form {
+  grid-template-columns: 1fr;
+}
+
+.sidebar .nav {
+  grid-template-columns: 1fr 1fr 1fr;
+}
+
+.sidebar .navLabel {
+  grid-column: 1 / -1;
+  order: -1;
+  text-align: left;
+  font-size: 0.8rem;
+}
+
+@media (max-width: 900px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+}

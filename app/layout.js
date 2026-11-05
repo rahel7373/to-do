@@ -1,8 +1,8 @@
 import "./globals.css";
 
 export const metadata = {
-  title: "할 일 관리",
-  description: "간단한 할 일 관리 웹",
+  title: "업무 관리",
+  description: "병원 외래간호 업무 관리 시트",
 };
 
 export default function RootLayout({ children }) {

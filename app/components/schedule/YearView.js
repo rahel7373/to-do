@@ -6,7 +6,9 @@ import {
   toLocalDate,
   weekdayIndex,
 } from "../../lib/date";
-import { markOn } from "../../lib/dayEntries";
+import { markOn, markText, meetingText, meetingsOn } from "../../lib/dayEntries";
+import { holidayOf } from "../../lib/holidays";
+import { recurringOn } from "../../lib/recurring";
 import { eventsOn } from "../../lib/schedule";
 import styles from "./Schedule.module.css";
 
@@ -22,6 +24,24 @@ function dayKind(events, ymd, mark) {
   if (list.some((e) => e.type === "holiday")) return "holiday";
   if (list.length) return "work";
   return null;
+}
+
+// 커서를 올렸을 때 보여 줄 그날의 내용 (없으면 빈 문자열)
+function dayInfo(events, dayData, rules, ymd) {
+  const lines = [];
+  const holiday = holidayOf(ymd);
+  if (holiday) lines.push(`${holiday.name}${holiday.kind === "half" ? " (오전 근무)" : ""}`);
+  const mark = markOn(dayData, rules, ymd);
+  if (mark) lines.push(`[${markText(mark)}]`);
+  for (const { meeting } of meetingsOn(dayData, rules, ymd)) {
+    lines.push(`회의 ${meetingText(meeting)}`);
+  }
+  for (const e of eventsOn(events, ymd)) {
+    const label = { work: "업무", holiday: "휴일", leave: "휴가" }[e.type];
+    lines.push(`${label} ${e.startTime ? e.startTime + " " : ""}${e.title}`);
+  }
+  for (const r of recurringOn(ymd)) lines.push(`정기 ${r.label}`);
+  return lines.length ? [ymd.slice(5), ...lines].join("\n") : "";
 }
 
 export default function YearView({
@@ -74,6 +94,7 @@ export default function YearView({
                 return (
                   <span
                     key={ymd}
+                    title={dayInfo(events, dayData, rules, ymd) || undefined}
                     className={[
                       styles.miniDay,
                       weekdayIndex(ymd) >= 5 ? styles.weekendText : "",

@@ -6,7 +6,7 @@ import {
   todayYMD,
   weekdayIndex,
 } from "../../lib/date";
-import { markOn, markText, meetingText, meetingsOn } from "../../lib/dayEntries";
+import { markOn, markText, meetingText, meetingsOn, todosOn } from "../../lib/dayEntries";
 import { holidayOf } from "../../lib/holidays";
 import { recurringOn } from "../../lib/recurring";
 import { eventsOn } from "../../lib/schedule";
@@ -17,14 +17,14 @@ const WEEK_SUN_FIRST = ["일", "월", "화", "수", "목", "금", "토"];
 const pad = (n) => String(n).padStart(2, "0");
 
 // 같은 날에 여러 종류가 있으면 휴가 > 휴일 > 업무 순으로 색을 정한다.
-function dayKind(events, ymd, mark) {
+function dayKind(events, ymd, mark, hasTodo) {
   const list = eventsOn(events, ymd);
   if (mark?.kind === "leave") return "leave";
   if (mark?.kind === "training") return "training";
   if (mark?.kind === "off") return "holiday";
   if (list.some((e) => e.type === "leave")) return "leave";
   if (list.some((e) => e.type === "holiday")) return "holiday";
-  if (list.length) return "work";
+  if (list.length || hasTodo) return "work";
   return null;
 }
 
@@ -37,6 +37,9 @@ function dayInfo(events, dayData, rules, ymd, recurLabels) {
   if (mark) lines.push(`[${markText(mark)}]`);
   for (const { meeting } of meetingsOn(dayData, rules, ymd)) {
     lines.push(`회의 ${meetingText(meeting)}${meeting.cancelled ? " (취소)" : ""}`);
+  }
+  for (const { todo } of todosOn(dayData, rules, ymd)) {
+    lines.push(`업무 ${todo.done ? "(완료) " : ""}${todo.text}`);
   }
   for (const e of eventsOn(events, ymd)) {
     const label = { work: "업무", holiday: "휴일", leave: "휴가" }[e.type];
@@ -70,6 +73,9 @@ export default function YearView({
           events.filter(
             (e) => e.type === type && e.startDate <= last && e.endDate >= first
           ).length;
+        const todoCount = Array.from({ length: daysInMonth(year, m) }, (_, i) =>
+          todosOn(dayData, rules, `${year}-${pad(m)}-${pad(i + 1)}`).length
+        ).reduce((a, b) => a + b, 0);
         const marked = (kinds) =>
           Array.from({ length: daysInMonth(year, m) }, (_, i) =>
             markOn(dayData, rules, `${year}-${pad(m)}-${pad(i + 1)}`)
@@ -99,7 +105,7 @@ export default function YearView({
               ))}
               {Array.from({ length: daysInMonth(year, m) }, (_, i) => {
                 const ymd = `${year}-${pad(m)}-${pad(i + 1)}`;
-                const kind = dayKind(events, ymd, markOn(dayData, rules, ymd));
+                const kind = dayKind(events, ymd, markOn(dayData, rules, ymd), todosOn(dayData, rules, ymd).length > 0);
                 return (
                   <span
                     key={ymd}
@@ -117,7 +123,7 @@ export default function YearView({
               })}
             </div>
             <p className={styles.yearCounts}>
-              업무 {count("work")} · 휴일 {count("holiday") + marked(["off"])} · 휴가{" "}
+              업무 {count("work") + todoCount} · 휴일 {count("holiday") + marked(["off"])} · 휴가{" "}
               {count("leave") + marked(["leave"])} · 교육{" "}
               {marked(["training"])}
             </p>

@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import { daysInMonth, toLocalDate } from "../../lib/date";
 import { EVENT_TYPES } from "../../lib/schedule";
 import { describeRule } from "../../lib/dayLog";
-import { markOn, markText, meetingText, meetingsOn } from "../../lib/dayEntries";
+import { markOn, markText, meetingText, meetingsOn, todosOn } from "../../lib/dayEntries";
 import { recurringInMonth } from "../../lib/recurring";
 import RecurCheck from "./RecurCheck";
 import EventChip from "./EventChip";
@@ -78,6 +78,9 @@ export default function QuarterView({
               sheetItems.push({ kind: "mark", markKind: mark.kind, text, dates: [ymd] });
             }
           }
+          for (const { index, todo } of todosOn(dayData, rules, ymd)) {
+            sheetItems.push({ kind: "todo", index, text: todo.text, dates: [ymd], done: todo.done });
+          }
           for (const { index, meeting } of meetingsOn(dayData, rules, ymd)) {
             if (meeting.ruleId) continue; // 반복 회의는 아래 '반복 회의'에 한 줄로 표시
             sheetItems.push({ kind: "meeting", index, text: meetingText(meeting), dates: [ymd], important: meeting.important, cancelled: !!meeting.cancelled });
@@ -89,6 +92,13 @@ export default function QuarterView({
             onChangeDay(ymd, (d) =>
               it.kind === "mark"
                 ? { ...d, mark: null }
+                : it.kind === "todo"
+                  ? {
+                      ...d,
+                      todos: d.todos.map((x, i) =>
+                        i === it.index ? { text: "", done: false } : x
+                      ),
+                    }
                 : {
                     ...d,
                     meetings: d.meetings.map((x, i) =>
@@ -159,6 +169,8 @@ export default function QuarterView({
                       className={`${styles.chip} ${
                         it.kind === "mark"
                           ? styles[`mk_${it.markKind}`]
+                          : it.kind === "todo"
+                            ? `${styles.work} ${it.done ? styles.chipDone : ""}`
                           : `${styles.meetChip} ${it.important ? styles.meetImportant : ""} ${it.cancelled ? styles.meetCancelled : ""}`
                       }`}
                     >
@@ -167,10 +179,10 @@ export default function QuarterView({
                         type="button"
                         className={styles.chipDelete}
                         onClick={() => clearItem(it)}
-                        aria-label={`${it.dates[0]} ${it.text} ${it.kind === "mark" ? "삭제" : "취소 표시"}`}
-                        title={it.kind === "mark" ? "삭제" : "회의가 취소되면 눌러 표시"}
+                        aria-label={`${it.dates[0]} ${it.text} ${it.kind === "meeting" ? "취소 표시" : "삭제"}`}
+                        title={it.kind === "meeting" ? "회의가 취소되면 눌러 표시" : "삭제"}
                       >
-                        {it.kind === "mark" ? "×" : it.cancelled ? "복원" : "취소"}
+                        {it.kind !== "meeting" ? "×" : it.cancelled ? "복원" : "취소"}
                       </button>
                     </span>
                   </li>

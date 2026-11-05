@@ -75,7 +75,15 @@ export default function WeekSheet({
     dates.map((ymd) => [ymd, holidayInfo(ymd, events)])
   );
   // 휴일은 열 전체를 빨갛게, 오늘은 노랗게 칠한다.
-  const markOf = (ymd) => dayOf(ymd).mark;
+  // 날짜 시트의 표시가 우선, 없으면 예전에 일정 폼으로 등록한 휴가를 보여 준다.
+  const markOf = (ymd) => {
+    const m = dayOf(ymd).mark;
+    if (m) return m;
+    const leave = eventsOn(events, ymd).find((e) => e.type === "leave");
+    return leave
+      ? { kind: "leave", text: leave.title === "휴가" ? "" : leave.title }
+      : null;
+  };
   const colClass = (ymd) =>
     holidays[ymd]?.kind === "off"
       ? styles.holidayCol

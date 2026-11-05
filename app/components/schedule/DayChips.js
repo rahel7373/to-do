@@ -57,10 +57,27 @@ export default function DayChips({ ymd, mark, meetings, onChangeDay }) {
           key={index}
           className={`${styles.chip} ${styles.chipMenuHost} ${styles.meetChip} ${
             meeting.important ? styles.meetImportant : ""
-          } ${meeting.cancelled ? styles.meetCancelled : ""}`}
+          } ${meeting.cancelled ? styles.meetCancelled : ""} ${
+            meeting.done ? styles.chipDone : ""
+          }`}
           onContextMenu={open(index)}
           title="우클릭: 중요·취소 표시"
         >
+          <input
+            type="checkbox"
+            className={styles.chipCheck}
+            checked={!!meeting.done}
+            onClick={(e) => e.stopPropagation()}
+            onChange={() =>
+              onChangeDay(ymd, (d) => ({
+                ...d,
+                meetings: d.meetings.map((m, i) =>
+                  i === index ? { ...m, done: !m.done } : m
+                ),
+              }))
+            }
+            aria-label={`${ymd} 회의 ${meetingText(meeting)} 수행 체크`}
+          />
           <span className={styles.chipText}>{meetingText(meeting)}</span>
           {menu === index && (
             <span className={styles.chipMenu}>

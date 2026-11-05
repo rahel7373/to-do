@@ -6,21 +6,31 @@ import {
   toLocalDate,
   weekdayIndex,
 } from "../../lib/date";
+import { markOn } from "../../lib/dayEntries";
 import { eventsOn } from "../../lib/schedule";
 import styles from "./Schedule.module.css";
 
 const pad = (n) => String(n).padStart(2, "0");
 
 // 같은 날에 여러 종류가 있으면 휴가 > 휴일 > 업무 순으로 색을 정한다.
-function dayKind(events, ymd) {
+function dayKind(events, ymd, mark) {
   const list = eventsOn(events, ymd);
+  if (mark?.kind === "leave") return "leave";
+  if (mark?.kind === "training") return "training";
+  if (mark?.kind === "off") return "holiday";
   if (list.some((e) => e.type === "leave")) return "leave";
   if (list.some((e) => e.type === "holiday")) return "holiday";
   if (list.length) return "work";
   return null;
 }
 
-export default function YearView({ anchor, events, onPickMonth }) {
+export default function YearView({
+  anchor,
+  events,
+  days: dayData,
+  rules,
+  onPickMonth,
+}) {
   const year = toLocalDate(anchor).getFullYear();
 
   return (
@@ -36,6 +46,10 @@ export default function YearView({ anchor, events, onPickMonth }) {
           events.filter(
             (e) => e.type === type && e.startDate <= last && e.endDate >= first
           ).length;
+        const marked = (kinds) =>
+          Array.from({ length: daysInMonth(year, m) }, (_, i) =>
+            markOn(dayData, rules, `${year}-${pad(m)}-${pad(i + 1)}`)
+          ).filter((k) => k && kinds.includes(k.kind)).length;
         return (
           <button
             key={m}
@@ -56,7 +70,7 @@ export default function YearView({ anchor, events, onPickMonth }) {
               ))}
               {Array.from({ length: daysInMonth(year, m) }, (_, i) => {
                 const ymd = `${year}-${pad(m)}-${pad(i + 1)}`;
-                const kind = dayKind(events, ymd);
+                const kind = dayKind(events, ymd, markOn(dayData, rules, ymd));
                 return (
                   <span
                     key={ymd}
@@ -72,8 +86,9 @@ export default function YearView({ anchor, events, onPickMonth }) {
               })}
             </div>
             <p className={styles.yearCounts}>
-              업무 {count("work")} · 휴일 {count("holiday")} · 휴가{" "}
-              {count("leave")}
+              업무 {count("work")} · 휴일 {count("holiday") + marked(["off"])} · 휴가{" "}
+              {count("leave") + marked(["leave"])} · 교육{" "}
+              {marked(["training"])}
             </p>
           </button>
         );

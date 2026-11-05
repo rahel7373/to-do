@@ -9,6 +9,8 @@ import {
 } from "../../lib/date";
 import { eventsOn, sortAllDay } from "../../lib/schedule";
 import { recurringInMonth } from "../../lib/recurring";
+import DayChips from "./DayChips";
+import { markOn, meetingsOn } from "../../lib/dayEntries";
 import RecurCheck from "./RecurCheck";
 import EventChip from "./EventChip";
 import styles from "./Schedule.module.css";
@@ -19,6 +21,7 @@ export default function MonthView({
   anchor,
   events,
   days: dayData,
+  rules,
   onChangeDay,
   onDelete,
   onPickDate,
@@ -74,6 +77,12 @@ export default function MonthView({
                   onChangeDay={onChangeDay}
                 />
               ))}
+            <DayChips
+              ymd={ymd}
+              mark={markOn(dayData, rules, ymd)}
+              meetings={meetingsOn(dayData, rules, ymd)}
+              onChangeDay={onChangeDay}
+            />
             {list.map((ev) => (
               <EventChip key={ev.id} ev={ev} onDelete={onDelete} showTime />
             ))}

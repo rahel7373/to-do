@@ -3,6 +3,8 @@
 import { useLayoutEffect, useRef } from "react";
 import { daysInMonth, toLocalDate } from "../../lib/date";
 import { EVENT_TYPES } from "../../lib/schedule";
+import { describeRule } from "../../lib/dayLog";
+import { markOn, markText, meetingText, meetingsOn } from "../../lib/dayEntries";
 import { recurringInMonth } from "../../lib/recurring";
 import RecurCheck from "./RecurCheck";
 import EventChip from "./EventChip";
@@ -14,6 +16,7 @@ export default function QuarterView({
   anchor,
   events,
   days: dayData,
+  rules,
   onChangeDay,
   onDelete,
 }) {
@@ -58,6 +61,47 @@ export default function QuarterView({
               a.createdAt - b.createdAt
           );
         const recur = recurringInMonth(year, m);
+        // 날짜별 시트의 휴가·교육(연속된 같은 표시는 기간으로 묶음)과 직접 넣은 회의
+        const sheetItems = [];
+        for (let day = 1; day <= daysInMonth(year, m); day++) {
+          const ymd = `${year}-${pad(m)}-${pad(day)}`;
+          const mark = markOn(dayData, rules, ymd);
+          if (mark) {
+            const last = sheetItems[sheetItems.length - 1];
+            const text = markText(mark);
+            if (
+              last &&
+              last.kind === "mark" &&
+              last.markKind === mark.kind &&
+              last.text === text &&
+              last.dates[last.dates.length - 1] === `${year}-${pad(m)}-${pad(day - 1)}`
+            ) {
+              last.dates.push(ymd);
+            } else {
+              sheetItems.push({ kind: "mark", markKind: mark.kind, text, dates: [ymd] });
+            }
+          }
+          for (const { index, meeting } of meetingsOn(dayData, rules, ymd)) {
+            if (meeting.ruleId) continue; // 반복 회의는 아래 '반복 회의'에 한 줄로 표시
+            sheetItems.push({ kind: "meeting", index, text: meetingText(meeting), dates: [ymd], important: meeting.important });
+          }
+        }
+        const clearItem = (it) => {
+          for (const ymd of it.dates) {
+            onChangeDay(ymd, (d) =>
+              it.kind === "mark"
+                ? { ...d, mark: null }
+                : {
+                    ...d,
+                    meetings: d.meetings.map((x, i) =>
+                      i === it.index
+                        ? { time: "", place: "", custom: "", title: "", important: false }
+                        : x
+                    ),
+                  }
+            );
+          }
+        };
         return (
           <section key={m} className={styles.quarterMonth}>
             <h3>{m}월</h3>
@@ -89,10 +133,56 @@ export default function QuarterView({
                   </div>
                 )
             )}
+            {rules.length > 0 && (
+              <div className={styles.recurGroup}>
+                <h4 className={styles.recurGroupTitle}>반복 회의</h4>
+                <ul className={styles.eventList}>
+                  {rules.map((r) => (
+                    <li key={r.id}>
+                      <span className={styles.eventDate}>{describeRule(r)}</span>
+                      <span className={`${styles.chip} ${styles.meetChip}`}>
+                        <span className={styles.chipText}>
+                          {[r.time, r.title || r.custom || r.place].filter(Boolean).join(" ")}
+                        </span>
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
             <h4 className={styles.recurGroupTitle}>등록한 일정</h4>
-            {list.length === 0 ? (
+            {sheetItems.length > 0 && (
+              <ul className={styles.eventList}>
+                {sheetItems.map((it, i) => (
+                  <li key={`s${i}`}>
+                    <span className={styles.eventDate}>
+                      {it.dates[0].slice(5)}
+                      {it.dates.length > 1 && ` ~ ${it.dates[it.dates.length - 1].slice(5)}`}
+                    </span>
+                    <span
+                      className={`${styles.chip} ${
+                        it.kind === "mark"
+                          ? styles[`mk_${it.markKind}`]
+                          : `${styles.meetChip} ${it.important ? styles.meetImportant : ""}`
+                      }`}
+                    >
+                      <span className={styles.chipText}>{it.text}</span>
+                      <button
+                        type="button"
+                        className={styles.chipDelete}
+                        onClick={() => clearItem(it)}
+                        aria-label={`${it.dates[0]} ${it.text} 삭제`}
+                      >
+                        ×
+                      </button>
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
+            {list.length === 0 && sheetItems.length === 0 ? (
               <p className={styles.muted}>등록된 일정이 없습니다.</p>
-            ) : (
+            ) : list.length === 0 ? null : (
               <ul className={styles.eventList}>
                 {list.map((ev) => (
                   <li key={ev.id}>

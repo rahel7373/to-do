@@ -37,6 +37,30 @@ export function meetingsOn(days, rules, ymd) {
     .filter(({ meeting }) => !isEmptyMeeting(meeting));
 }
 
+// 그날의 할 일(업무) 중 내용이 있는 칸: [{ index, todo }]
+export function todosOn(days, rules, ymd) {
+  return getDay(days, ymd, rules)
+    .todos.map((todo, index) => ({ index, todo }))
+    .filter(({ todo }) => todo.text.trim());
+}
+
+// 업무 하나를 날짜별 할 일 칸에 넣는다. 모든 날짜에 빈 칸이 있어야 넣고, 없으면 null.
+export function putTodo(days, rules, dates, text, done, pack) {
+  const slots = [];
+  for (const ymd of dates) {
+    const idx = getDay(days, ymd, rules).todos.findIndex((t) => !t.text.trim());
+    if (idx < 0) return null;
+    slots.push(idx);
+  }
+  const next = { ...days };
+  dates.forEach((ymd, k) => {
+    const day = getDay(next, ymd, rules);
+    const todos = day.todos.map((t, i) => (i === slots[k] ? { text, done: !!done } : t));
+    next[ymd] = pack({ ...day, todos }, ymd, rules);
+  });
+  return next;
+}
+
 export function markOn(days, rules, ymd) {
   return getDay(days, ymd, rules).mark;
 }

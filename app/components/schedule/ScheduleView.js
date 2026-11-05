@@ -19,7 +19,7 @@ import {
 import { useLocalList, useLocalState } from "../../lib/useLocalList";
 import EventForm from "./EventForm";
 import LongTermTasks from "./LongTermTasks";
-import { datesBetween, firstFreeSlot } from "../../lib/dayEntries";
+import { datesBetween, firstFreeSlot, putTodo } from "../../lib/dayEntries";
 import { RECURRING } from "../../lib/recurring";
 import MonthView from "./MonthView";
 import QuarterView from "./QuarterView";
@@ -78,6 +78,28 @@ export default function ScheduleView({ view, onChangeView, top }) {
   const ready =
     loaded && daysLoaded && rulesLoaded && configLoaded && anchor !== "";
 
+  // 예전에 events에 저장한 업무를 날짜별 할 일 칸으로 한 번 옮긴다. (칸이 부족하면 그대로 둔다)
+  useEffect(() => {
+    if (!ready) return;
+    const works = events.filter((e) => e.type === "work");
+    if (!works.length) return;
+    let next = days;
+    const moved = new Set();
+    for (const ev of works) {
+      const text = ev.startTime && ev.endTime ? `${ev.startTime}~${ev.endTime} ${ev.title}` : ev.title;
+      const res = putTodo(next, rules, datesBetween(ev.startDate, ev.endDate), text, ev.done, packDay);
+      if (res) {
+        next = res;
+        moved.add(ev.id);
+      }
+    }
+    if (moved.size) {
+      setDays(next);
+      setEvents((prev) => prev.filter((e) => !moved.has(e.id)));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ready]);
+
   // 휴가·교육·기타 휴무·회의는 날짜별 업무 시트에 넣어 주간·월간·분기·연간에 함께 보이게 한다.
   // 돌려주는 문자열은 사용자에게 보여 줄 안내(비어 있으면 성공)이다.
   function addEvent(data) {
@@ -118,6 +140,16 @@ export default function ScheduleView({ view, onChangeView, top }) {
       });
       return "";
     }
+    if (data.type === "work") {
+      const text =
+        data.startTime && data.endTime
+          ? `${data.startTime}~${data.endTime} ${data.title}`
+          : data.title;
+      const next = putTodo(days, rules, dates, text, false, packDay);
+      if (!next) return "오늘 할 일 칸이 가득 찬 날이 있어요. (한 날에 최대 8개)";
+      setDays(next);
+      return "";
+    }
     setEvents((prev) => [
       ...prev,
       { id: crypto.randomUUID(), createdAt: Date.now(), ...data },
@@ -131,6 +163,13 @@ export default function ScheduleView({ view, onChangeView, top }) {
       ...prev,
       [ymd]: packDay(update(getDay(prev, ymd, rules)), ymd, rules),
     }));
+  }
+
+  // 월간에서 칩을 누르면 그날이 있는 주간 시트로 이동한다.
+  function openWeek(ymd) {
+    setAnchor(ymd);
+    setFormDate(ymd);
+    onChangeView("week");
   }
 
   function toggleEvent(id) {
@@ -272,6 +311,7 @@ export default function ScheduleView({ view, onChangeView, top }) {
           onDelete={deleteEvent}
           onToggleEvent={toggleEvent}
           onAdd={addEvent}
+          onOpenWeek={openWeek}
           onPickDate={pickDate}
         />
       )}

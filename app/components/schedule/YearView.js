@@ -34,7 +34,7 @@ function dayInfo(events, dayData, rules, ymd, recurLabels) {
   const mark = markOn(dayData, rules, ymd);
   if (mark) lines.push(`[${markText(mark)}]`);
   for (const { meeting } of meetingsOn(dayData, rules, ymd)) {
-    lines.push(`회의 ${meetingText(meeting)}`);
+    lines.push(`회의 ${meetingText(meeting)}${meeting.cancelled ? " (취소)" : ""}`);
   }
   for (const e of eventsOn(events, ymd)) {
     const label = { work: "업무", holiday: "휴일", leave: "휴가" }[e.type];

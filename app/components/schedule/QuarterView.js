@@ -80,9 +80,10 @@ export default function QuarterView({
           }
           for (const { index, meeting } of meetingsOn(dayData, rules, ymd)) {
             if (meeting.ruleId) continue; // 반복 회의는 아래 '반복 회의'에 한 줄로 표시
-            sheetItems.push({ kind: "meeting", index, text: meetingText(meeting), dates: [ymd], important: meeting.important });
+            sheetItems.push({ kind: "meeting", index, text: meetingText(meeting), dates: [ymd], important: meeting.important, cancelled: !!meeting.cancelled });
           }
         }
+        // 휴가·교육 표시는 지우고, 회의는 지우지 않고 취소 표시만 바꾼다.
         const clearItem = (it) => {
           for (const ymd of it.dates) {
             onChangeDay(ymd, (d) =>
@@ -91,9 +92,7 @@ export default function QuarterView({
                 : {
                     ...d,
                     meetings: d.meetings.map((x, i) =>
-                      i === it.index
-                        ? { time: "", place: "", custom: "", title: "", important: false }
-                        : x
+                      i === it.index ? { ...x, cancelled: !x.cancelled } : x
                     ),
                   }
             );
@@ -160,7 +159,7 @@ export default function QuarterView({
                       className={`${styles.chip} ${
                         it.kind === "mark"
                           ? styles[`mk_${it.markKind}`]
-                          : `${styles.meetChip} ${it.important ? styles.meetImportant : ""}`
+                          : `${styles.meetChip} ${it.important ? styles.meetImportant : ""} ${it.cancelled ? styles.meetCancelled : ""}`
                       }`}
                     >
                       <span className={styles.chipText}>{it.text}</span>
@@ -168,9 +167,10 @@ export default function QuarterView({
                         type="button"
                         className={styles.chipDelete}
                         onClick={() => clearItem(it)}
-                        aria-label={`${it.dates[0]} ${it.text} 삭제`}
+                        aria-label={`${it.dates[0]} ${it.text} ${it.kind === "mark" ? "삭제" : "취소 표시"}`}
+                        title={it.kind === "mark" ? "삭제" : "회의가 취소되면 눌러 표시"}
                       >
-                        ×
+                        {it.kind === "mark" ? "×" : it.cancelled ? "복원" : "취소"}
                       </button>
                     </span>
                   </li>

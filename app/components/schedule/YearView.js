@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  WEEKDAYS,
   daysInMonth,
   toLocalDate,
   weekdayIndex,
@@ -11,6 +10,8 @@ import { holidayOf } from "../../lib/holidays";
 import { recurringOn } from "../../lib/recurring";
 import { eventsOn } from "../../lib/schedule";
 import styles from "./Schedule.module.css";
+
+const WEEK_SUN_FIRST = ["일", "월", "화", "수", "목", "금", "토"];
 
 const pad = (n) => String(n).padStart(2, "0");
 
@@ -81,12 +82,17 @@ export default function YearView({
           >
             <h3>{m}월</h3>
             <div className={styles.miniGrid}>
-              {WEEKDAYS.map((w) => (
-                <span key={w} className={styles.miniHead}>
+              {WEEK_SUN_FIRST.map((w) => (
+                <span
+                  key={w}
+                  className={`${styles.miniHead} ${
+                    w === "일" || w === "토" ? styles.weekendText : ""
+                  }`}
+                >
                   {w}
                 </span>
               ))}
-              {Array.from({ length: weekdayIndex(first) }, (_, i) => (
+              {Array.from({ length: (weekdayIndex(first) + 1) % 7 }, (_, i) => (
                 <span key={`b${i}`} />
               ))}
               {Array.from({ length: daysInMonth(year, m) }, (_, i) => {

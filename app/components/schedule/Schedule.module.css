@@ -1476,3 +1476,48 @@
   color: #64748b;
   letter-spacing: 0.02em;
 }
+
+/* 월간·분기의 정기 업무 체크 줄 */
+.recurCheck {
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+  cursor: pointer;
+}
+
+.recurCheck input {
+  flex: none;
+  margin: 1px 0 0;
+  accent-color: #be5a86;
+}
+
+/* 분기 보기: 한 화면에 들어가도록 촘촘하게 */
+.quarterMonth {
+  padding: 8px 10px;
+}
+
+.quarterMonth h3 {
+  margin: 0 0 4px;
+  font-size: 1.05rem;
+}
+
+.quarterMonth .eventList li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 1px 0;
+}
+
+.quarterMonth .recurChip {
+  margin: 1px 0;
+  padding: 1px 6px;
+  font-size: 0.76rem;
+}
+
+.quarterMonth .recurGroup {
+  margin-bottom: 2px;
+}
+
+.quarterMonth .recurGroupTitle {
+  margin: 4px 0 2px;
+}

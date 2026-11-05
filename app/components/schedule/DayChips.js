@@ -6,12 +6,18 @@ import styles from "./Schedule.module.css";
 
 // 월간 달력 한 칸: 휴가·교육 표시와 회의 (주간 시트와 같은 데이터)
 // 칸이 작아서 버튼은 숨기고, 항목을 우클릭(또는 길게 누름)하면 작은 메뉴로 취소·삭제를 한다.
-export default function DayChips({ ymd, mark, meetings, todos = [], onChangeDay, onOpen }) {
+export default function DayChips({ ymd, mark, meetings, todos = [], onChangeDay, onOpen, onMove }) {
   const [menu, setMenu] = useState(null); // "mark" | 회의 칸 번호
+  const [moveTo, setMoveTo] = useState(""); // 날짜 변경 입력값
+  const [moving, setMoving] = useState(false);
 
   useEffect(() => {
     if (menu === null) return;
-    const close = () => setMenu(null);
+    const close = (e) => {
+      if (e.composedPath?.().some((n) => n?.dataset?.chipmenu !== undefined)) return; // 메뉴 안(날짜 입력 등)은 닫지 않는다
+      setMenu(null);
+      setMoving(false);
+    };
     document.addEventListener("click", close);
     document.addEventListener("keydown", close);
     return () => {
@@ -23,6 +29,8 @@ export default function DayChips({ ymd, mark, meetings, todos = [], onChangeDay,
   const open = (key) => (e) => {
     e.preventDefault();
     e.stopPropagation();
+    setMoving(false);
+    setMoveTo(ymd);
     setMenu(key);
   };
 
@@ -59,7 +67,7 @@ export default function DayChips({ ymd, mark, meetings, todos = [], onChangeDay,
           />
           <span className={styles.chipText}>{todo.text}</span>
           {menu === `t${index}` && (
-            <span className={styles.chipMenu}>
+            <span data-chipmenu className={styles.chipMenu}>
               <button
                 type="button"
                 onClick={(e) => {
@@ -87,7 +95,7 @@ export default function DayChips({ ymd, mark, meetings, todos = [], onChangeDay,
         >
           <span className={styles.chipText}>{markText(mark)}</span>
           {menu === "mark" && (
-            <span className={styles.chipMenu}>
+            <span data-chipmenu className={styles.chipMenu}>
               <button
                 type="button"
                 onClick={(e) => {
@@ -113,7 +121,7 @@ export default function DayChips({ ymd, mark, meetings, todos = [], onChangeDay,
           }`}
           onClick={go}
           onContextMenu={open(index)}
-          title="누르면 주간 시트로 · 우클릭: 중요·취소 표시"
+          title="누르면 주간 시트로 · 우클릭: 날짜 변경·중요·취소"
         >
           <input
             type="checkbox"
@@ -132,7 +140,34 @@ export default function DayChips({ ymd, mark, meetings, todos = [], onChangeDay,
           />
           <span className={styles.chipText}>{meetingText(meeting)}</span>
           {menu === index && (
-            <span className={styles.chipMenu}>
+            <span data-chipmenu className={styles.chipMenu} onClick={(e) => e.stopPropagation()}>
+              {moving ? (
+                <span className={styles.moveRow}>
+                  <input
+                    type="date"
+                    value={moveTo}
+                    onChange={(e) => setMoveTo(e.target.value)}
+                    aria-label={`${ymd} 회의 ${meetingText(meeting)} 옮길 날짜`}
+                  />
+                  <button
+                    type="button"
+                    disabled={!moveTo || moveTo === ymd}
+                    onClick={() => {
+                      const msg = onMove(ymd, index, moveTo);
+                      if (msg) alert(msg);
+                      setMoving(false);
+                      setMenu(null);
+                    }}
+                    aria-label={`${ymd} 회의 ${meetingText(meeting)} 날짜로 이동`}
+                  >
+                    이동
+                  </button>
+                </span>
+              ) : (
+                <button type="button" onClick={() => setMoving(true)}>
+                  날짜 변경
+                </button>
+              )}
               <button
                 type="button"
                 className={styles.chipMenuStar}

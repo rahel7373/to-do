@@ -30,7 +30,7 @@ import styles from "./Schedule.module.css";
 function shift(view, ymd, dir) {
   if (view === "week") return addDays(ymd, 7 * dir);
   if (view === "month") return addMonths(ymd, dir);
-  if (view === "quarter") return addMonths(ymd, 3 * dir);
+  if (view === "quarter") return addMonths(ymd, 12 * dir);
   return addMonths(ymd, 12 * dir);
 }
 
@@ -43,7 +43,7 @@ function rangeLabel(view, ymd) {
   }
   if (view === "month") return `${year}년 ${d.getMonth() + 1}월`;
   if (view === "quarter") {
-    return `${year}년 ${Math.floor(d.getMonth() / 3) + 1}분기`;
+    return `${year}년 분기별`;
   }
   return `${year}년`;
 }

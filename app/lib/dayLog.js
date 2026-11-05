@@ -21,7 +21,8 @@ export const MARK_KINDS = [
   ["off", "기타 휴무", ""],
 ];
 
-export const MEETING_SLOTS = 4;
+export const MEETING_SLOTS = 8; // 저장되는 최대 회의 칸
+export const MEETING_SHOWN = 4; // 처음에 보이는 회의 칸 수
 export const TODO_SLOTS = 8;
 export const TODO_DEFAULT_SHOWN = 4; // 처음에 보이는 할 일 칸 수
 export const INTERVIEW_SLOTS = 2;
@@ -139,6 +140,7 @@ export function defaultDay(ymd, rules = []) {
     amDepts: "",
     pmDepts: "",
     meetings: defaultMeetings(ymd, rules),
+    meetingCount: MEETING_SHOWN, // 보이는 회의 칸 수 (가득 차면 늘릴 수 있음)
     todoCount: TODO_DEFAULT_SHOWN, // 보이는 할 일 칸 수 (늘릴 수 있음)
     todos: range(TODO_SLOTS, () => ({ text: "", done: false })),
     interviews: range(INTERVIEW_SLOTS, () => ""),
@@ -212,11 +214,13 @@ export const DEFAULT_SHEET_CONFIG = {
     narcotics: "마약류 사인",
   },
   checkItems: CHECK_ITEMS.map(([id, label]) => ({ id, label })),
+  recurLabels: {}, // 정기 업무 이름을 고친 것 { 업무id: 이름 }
 };
 
 export function getConfig(saved) {
   return {
     labels: { ...DEFAULT_SHEET_CONFIG.labels, ...(saved?.labels ?? {}) },
+    recurLabels: { ...(saved?.recurLabels ?? {}) },
     checkItems: Array.isArray(saved?.checkItems)
       ? saved.checkItems
       : DEFAULT_SHEET_CONFIG.checkItems,

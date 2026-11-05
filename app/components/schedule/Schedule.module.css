@@ -1563,3 +1563,44 @@
   font-weight: 800;
   color: #1e293b;
 }
+
+/* 장기 중요 업무 이름 수정 */
+.longTitleInput {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  background: transparent;
+  font: inherit;
+  font-size: 0.8rem;
+  resize: none;
+  overflow: hidden;
+}
+.longTitleInput:hover,
+.longTitleInput:focus {
+  border-color: #d8c48f;
+  background: #fffdf6;
+  outline: none;
+}
+
+/* 정기 업무 내용 편집 (왼쪽 열) */
+.recurEdit {
+  margin-top: 8px;
+}
+.recurEditRow {
+  display: grid;
+  gap: 2px;
+  margin-bottom: 6px;
+  font-size: 0.72rem;
+  color: #64748b;
+}
+.recurEditInput {
+  width: 100%;
+  padding: 3px 5px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font: inherit;
+  font-size: 0.76rem;
+  resize: none;
+}

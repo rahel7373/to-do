@@ -6,13 +6,14 @@ import {
   INTERVIEW_SLOTS,
   MARK_KINDS,
   MEETING_SLOTS,
+  MEETING_SHOWN,
   TODO_DEFAULT_SHOWN,
   TODO_SLOTS,
   getDay,
 } from "../../lib/dayLog";
 import { holidayOf } from "../../lib/holidays";
 import MeetingCell from "./MeetingCell";
-import { meetingOrder } from "../../lib/dayEntries";
+import { isEmptyMeeting, meetingOrder } from "../../lib/dayEntries";
 import { recurringOn } from "../../lib/recurring";
 import { eventsOn } from "../../lib/schedule";
 import styles from "./Schedule.module.css";
@@ -171,6 +172,19 @@ export default function WeekSheet({
   const todoRows = Math.max(
     TODO_DEFAULT_SHOWN,
     ...dates.map((ymd) => shownTodos(dayOf(ymd)))
+  );
+  // 회의 칸 수: 기본 4칸, 어느 날이든 가득 차서 늘렸으면 그만큼 (최대 8칸)
+  const filledMeetings = (d) =>
+    d.meetings.filter((m) => !isEmptyMeeting(m)).length;
+  const meetingRows = Math.min(
+    MEETING_SLOTS,
+    Math.max(
+      MEETING_SHOWN,
+      ...dates.map((ymd) => {
+        const d = dayOf(ymd);
+        return Math.max(d.meetingCount ?? MEETING_SHOWN, filledMeetings(d));
+      })
+    )
   );
   const setLabel = (key, value) =>
     onChangeConfig((c) => ({ ...c, labels: { ...c.labels, [key]: value } }));
@@ -335,7 +349,7 @@ export default function WeekSheet({
           {textRow("amDepts", "amDepts")}
           {textRow("pmDepts", "pmDepts")}
 
-          {range(MEETING_SLOTS).map((i) =>
+          {range(meetingRows).map((i) =>
             row(
               labels.meetings,
               (ymd, d) => {
@@ -344,6 +358,7 @@ export default function WeekSheet({
                 const m = d.meetings[slot];
                 const key = `${ymd}#${slot}`;
                 return (
+                  <>
                   <MeetingCell
                     ymd={ymd}
                     index={i}
@@ -357,10 +372,29 @@ export default function WeekSheet({
                     onAddRule={onAddRule}
                     onDeleteRule={onDeleteRule}
                   />
+                  {i === meetingRows - 1 &&
+                    meetingRows < MEETING_SLOTS &&
+                    filledMeetings(d) >= meetingRows && (
+                      <button
+                        type="button"
+                        className={styles.addMeeting}
+                        onClick={() =>
+                          onChangeDay(ymd, (x) => ({
+                            ...x,
+                            meetingCount: meetingRows + 1,
+                          }))
+                        }
+                        aria-label={`${label(ymd)} 회의 칸 추가`}
+                        title="회의 칸 추가"
+                      >
+                        +
+                      </button>
+                    )}
+                  </>
                 );
               },
               {
-                span: MEETING_SLOTS,
+                span: meetingRows,
                 first: i === 0,
                 id: `meeting${i}`,
                 labelNode: editableLabel(labels.meetings, (v) =>
@@ -530,7 +564,7 @@ export default function WeekSheet({
 
           {row(labels.recur, (ymd, d) => (
             <div className={styles.recurList}>
-              {recurringOn(ymd).map((r) => {
+              {recurringOn(ymd, config.recurLabels).map((r) => {
                 const done = !!d.recurDone?.[r.id];
                 return (
                   <label key={r.id} className={styles.recurItem}>

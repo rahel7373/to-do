@@ -20,6 +20,7 @@ import { useLocalList, useLocalState } from "../../lib/useLocalList";
 import EventForm from "./EventForm";
 import LongTermTasks from "./LongTermTasks";
 import { datesBetween, firstFreeSlot } from "../../lib/dayEntries";
+import { RECURRING } from "../../lib/recurring";
 import MonthView from "./MonthView";
 import QuarterView from "./QuarterView";
 import WeekSheet from "./WeekSheet";
@@ -204,6 +205,39 @@ export default function ScheduleView({ view, onChangeView, top }) {
               아니어도 줄 이름을 눌러 바로 바꿀 수 있어요.
             </p>
           )}
+          {editItems && (
+            <div className={styles.recurEdit}>
+              <h4 className={styles.recurGroupTitle}>정기 업무 내용</h4>
+              {RECURRING.map((r) => (
+                <label key={r.id} className={styles.recurEditRow}>
+                  <span>
+                    {r.months ? "분기 " : "매월 "}
+                    {r.day}일
+                  </span>
+                  <textarea
+                    className={styles.recurEditInput}
+                    rows={2}
+                    value={config.recurLabels[r.id] ?? r.label}
+                    placeholder={r.label}
+                    onChange={(e) =>
+                      setConfig((prev) => {
+                        const c = getConfig(prev);
+                        return {
+                          ...c,
+                          recurLabels: {
+                            ...c.recurLabels,
+                            [r.id]: e.target.value.replace(/\n/g, ""),
+                          },
+                        };
+                      })
+                    }
+                    aria-label={`정기 업무 ${r.label}`}
+                  />
+                </label>
+              ))}
+              <p className={styles.muted}>비우면 원래 이름으로 돌아가요.</p>
+            </div>
+          )}
         </div>
       )}
       <LongTermTasks />
@@ -232,6 +266,7 @@ export default function ScheduleView({ view, onChangeView, top }) {
           events={events}
           days={days}
           rules={rules}
+          recurLabels={config.recurLabels}
           onChangeDay={changeDay}
           onDelete={deleteEvent}
           onPickDate={pickDate}
@@ -243,6 +278,7 @@ export default function ScheduleView({ view, onChangeView, top }) {
           events={events}
           days={days}
           rules={rules}
+          recurLabels={config.recurLabels}
           onChangeDay={changeDay}
           onDelete={deleteEvent}
         />
@@ -253,6 +289,7 @@ export default function ScheduleView({ view, onChangeView, top }) {
           events={events}
           days={days}
           rules={rules}
+          recurLabels={config.recurLabels}
           onPickMonth={pickMonth}
         />
       )}

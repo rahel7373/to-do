@@ -27,7 +27,7 @@ function dayKind(events, ymd, mark) {
 }
 
 // 커서를 올렸을 때 보여 줄 그날의 내용 (없으면 빈 문자열)
-function dayInfo(events, dayData, rules, ymd) {
+function dayInfo(events, dayData, rules, ymd, recurLabels) {
   const lines = [];
   const holiday = holidayOf(ymd);
   if (holiday) lines.push(`${holiday.name}${holiday.kind === "half" ? " (오전 근무)" : ""}`);
@@ -40,7 +40,7 @@ function dayInfo(events, dayData, rules, ymd) {
     const label = { work: "업무", holiday: "휴일", leave: "휴가" }[e.type];
     lines.push(`${label} ${e.startTime ? e.startTime + " " : ""}${e.title}`);
   }
-  for (const r of recurringOn(ymd)) lines.push(`정기 ${r.label}`);
+  for (const r of recurringOn(ymd, recurLabels)) lines.push(`정기 ${r.label}`);
   return lines.length ? [ymd.slice(5), ...lines].join("\n") : "";
 }
 
@@ -49,6 +49,7 @@ export default function YearView({
   events,
   days: dayData,
   rules,
+  recurLabels,
   onPickMonth,
 }) {
   const year = toLocalDate(anchor).getFullYear();
@@ -94,7 +95,7 @@ export default function YearView({
                 return (
                   <span
                     key={ymd}
-                    title={dayInfo(events, dayData, rules, ymd) || undefined}
+                    title={dayInfo(events, dayData, rules, ymd, recurLabels) || undefined}
                     className={[
                       styles.miniDay,
                       weekdayIndex(ymd) >= 5 ? styles.weekendText : "",

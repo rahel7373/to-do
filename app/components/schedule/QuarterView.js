@@ -17,6 +17,7 @@ export default function QuarterView({
   events,
   days: dayData,
   rules,
+  recurLabels,
   onChangeDay,
   onDelete,
 }) {
@@ -56,7 +57,7 @@ export default function QuarterView({
               a.startDate.localeCompare(b.startDate) ||
               a.createdAt - b.createdAt
           );
-        const recur = recurringInMonth(year, m);
+        const recur = recurringInMonth(year, m, recurLabels);
         // 날짜별 시트의 휴가·교육(연속된 같은 표시는 기간으로 묶음)과 직접 넣은 회의
         const sheetItems = [];
         for (let day = 1; day <= daysInMonth(year, m); day++) {

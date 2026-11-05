@@ -22,6 +22,7 @@ export default function MonthView({
   events,
   days: dayData,
   rules,
+  recurLabels,
   onChangeDay,
   onDelete,
   onPickDate,
@@ -31,7 +32,7 @@ export default function MonthView({
   const month = d.getMonth() + 1;
   const blanks = weekdayIndex(`${year}-${pad(month)}-01`);
   const today = todayYMD();
-  const recur = recurringInMonth(year, month);
+  const recur = recurringInMonth(year, month, recurLabels);
   const days = Array.from({ length: daysInMonth(year, month) }, (_, i) => i + 1);
 
   return (

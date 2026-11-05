@@ -65,19 +65,24 @@ function dueDate(year, month, day) {
 }
 
 // 그날 해야 하는 정기 업무 목록
-export function recurringOn(ymd) {
+// labels: { 업무id: 고친 이름 } (비어 있으면 기본 이름)
+export function recurringOn(ymd, labels) {
   const [y, m] = ymd.split("-").map(Number);
   return RECURRING.filter(
     (r) => (!r.months || r.months.includes(m)) && dueDate(y, m, r.day) === ymd
-  );
+  ).map((r) => ({ ...r, label: labels?.[r.id] || r.label }));
 }
 
 // 한 달 안의 정기 업무: [{ ymd, item, quarterly }] (날짜순)
-export function recurringInMonth(year, month) {
+export function recurringInMonth(year, month, labels) {
   const out = [];
   for (const r of RECURRING) {
     if (r.months && !r.months.includes(month)) continue;
-    out.push({ ymd: dueDate(year, month, r.day), item: r, quarterly: !!r.months });
+    out.push({
+      ymd: dueDate(year, month, r.day),
+      item: { ...r, label: labels?.[r.id] || r.label },
+      quarterly: !!r.months,
+    });
   }
   return out.sort((a, b) => a.ymd.localeCompare(b.ymd));
 }

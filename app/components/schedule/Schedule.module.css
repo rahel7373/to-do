@@ -1730,3 +1730,32 @@
   text-align: center;
   font-size: 0.75rem;
 }
+
+/* 오늘: 열 전체를 연노랑으로 칠하고 머리글은 진하게 */
+.sheet td.todayCell {
+  background: #fff0b8;
+}
+.sheet td.todayCell input,
+.sheet td.todayCell select,
+.sheet td.todayCell textarea {
+  background: transparent;
+}
+.sheet thead th.todayCell {
+  background: #f5c542;
+  color: #5b3a00;
+  font-weight: 700;
+  box-shadow: inset 0 -3px 0 #d98e04;
+}
+.monthCell.today {
+  background: #fff0b8;
+  box-shadow: inset 0 0 0 2px #f2b84b;
+}
+.monthCell.today .dayNum {
+  font-weight: 700;
+  color: #92400e;
+}
+.miniDay.miniToday {
+  background: #f5c542;
+  color: #5b3a00;
+  font-weight: 700;
+}

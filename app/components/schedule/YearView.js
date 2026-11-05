@@ -3,6 +3,7 @@
 import {
   daysInMonth,
   toLocalDate,
+  todayYMD,
   weekdayIndex,
 } from "../../lib/date";
 import { markOn, markText, meetingText, meetingsOn } from "../../lib/dayEntries";
@@ -54,6 +55,7 @@ export default function YearView({
   onPickMonth,
 }) {
   const year = toLocalDate(anchor).getFullYear();
+  const today = todayYMD();
 
   return (
     <>
@@ -106,6 +108,7 @@ export default function YearView({
                       styles.miniDay,
                       weekdayIndex(ymd) >= 5 ? styles.weekendText : "",
                       kind ? styles[`day_${kind}`] : "",
+                      ymd === today ? styles.miniToday : "",
                     ].join(" ")}
                   >
                     {i + 1}

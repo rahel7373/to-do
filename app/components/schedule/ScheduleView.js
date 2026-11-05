@@ -182,11 +182,6 @@ export default function ScheduleView({ view, onChangeView, top }) {
         >
           오늘
         </button>
-        <span className={styles.legend}>
-          <i className={`${styles.dot} ${styles.work}`} /> 업무
-          <i className={`${styles.dot} ${styles.holiday}`} /> 휴일
-          <i className={`${styles.dot} ${styles.leave}`} /> 휴가
-        </span>
       </div>
 
       {view === "week" && (

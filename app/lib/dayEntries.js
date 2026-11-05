@@ -13,10 +13,27 @@ export const isEmptyMeeting = (m) =>
 export const meetingText = (m) =>
   [m.time, m.title || m.custom || m.place].filter(Boolean).join(" ");
 
-// 그날의 회의 중 내용이 있는 칸: [{ index, meeting }]
+// 회의 칸을 보여 줄 순서(칸 번호 목록): 내용이 있는 칸은 시간 순(시간이 없으면 그 뒤),
+// 빈 칸은 맨 아래. 입력한 칸 번호와 상관없이 시간 순으로 보인다.
+export function meetingOrder(meetings) {
+  return meetings
+    .map((m, index) => ({ m, index }))
+    .sort((a, b) => {
+      const ea = isEmptyMeeting(a.m) ? 1 : 0;
+      const eb = isEmptyMeeting(b.m) ? 1 : 0;
+      if (ea !== eb) return ea - eb;
+      if (ea) return a.index - b.index;
+      if (!a.m.time !== !b.m.time) return a.m.time ? -1 : 1;
+      return a.m.time.localeCompare(b.m.time) || a.index - b.index;
+    })
+    .map((x) => x.index);
+}
+
+// 그날의 회의 중 내용이 있는 칸을 시간 순으로: [{ index, meeting }]
 export function meetingsOn(days, rules, ymd) {
-  return getDay(days, ymd, rules)
-    .meetings.map((meeting, index) => ({ index, meeting }))
+  const meetings = getDay(days, ymd, rules).meetings;
+  return meetingOrder(meetings)
+    .map((index) => ({ index, meeting: meetings[index] }))
     .filter(({ meeting }) => !isEmptyMeeting(meeting));
 }
 

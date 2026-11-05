@@ -59,11 +59,28 @@ export default function DayChips({ ymd, mark, meetings, onChangeDay }) {
             meeting.important ? styles.meetImportant : ""
           } ${meeting.cancelled ? styles.meetCancelled : ""}`}
           onContextMenu={open(index)}
-          title="우클릭: 취소 표시"
+          title="우클릭: 중요·취소 표시"
         >
           <span className={styles.chipText}>{meetingText(meeting)}</span>
           {menu === index && (
             <span className={styles.chipMenu}>
+              <button
+                type="button"
+                className={styles.chipMenuStar}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setMenu(null);
+                  onChangeDay(ymd, (d) => ({
+                    ...d,
+                    meetings: d.meetings.map((m, i) =>
+                      i === index ? { ...m, important: !m.important } : m
+                    ),
+                  }));
+                }}
+                aria-label={`${ymd} 회의 ${meetingText(meeting)} 중요 표시`}
+              >
+                {meeting.important ? "중요 해제" : "★ 중요 표시"}
+              </button>
               <button
                 type="button"
                 onClick={(e) => {

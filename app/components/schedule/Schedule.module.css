@@ -1678,3 +1678,17 @@
 .chipMenu button:hover {
   background: #fbe4e4;
 }
+.chipMenu {
+  display: flex;
+  flex-direction: column;
+}
+.chipMenu .chipMenuStar {
+  color: #9a6208;
+}
+.chipMenu .chipMenuStar:hover {
+  background: #fff1cf;
+}
+.meetChip.meetImportant .chipText::before {
+  content: "★ ";
+  color: #e0922a;
+}

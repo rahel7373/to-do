@@ -188,12 +188,20 @@ export default function ScheduleView({ view, onChangeView, top }) {
         <MonthView
           anchor={anchor}
           events={events}
+          days={days}
+          onChangeDay={changeDay}
           onDelete={deleteEvent}
           onPickDate={pickDate}
         />
       )}
       {ready && view === "quarter" && (
-        <QuarterView anchor={anchor} events={events} onDelete={deleteEvent} />
+        <QuarterView
+          anchor={anchor}
+          events={events}
+          days={days}
+          onChangeDay={changeDay}
+          onDelete={deleteEvent}
+        />
       )}
       {ready && view === "year" && (
         <YearView anchor={anchor} events={events} onPickMonth={pickMonth} />

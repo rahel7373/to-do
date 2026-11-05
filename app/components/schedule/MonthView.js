@@ -9,12 +9,20 @@ import {
 } from "../../lib/date";
 import { eventsOn, sortAllDay } from "../../lib/schedule";
 import { recurringInMonth } from "../../lib/recurring";
+import RecurCheck from "./RecurCheck";
 import EventChip from "./EventChip";
 import styles from "./Schedule.module.css";
 
 const pad = (n) => String(n).padStart(2, "0");
 
-export default function MonthView({ anchor, events, onDelete, onPickDate }) {
+export default function MonthView({
+  anchor,
+  events,
+  days: dayData,
+  onChangeDay,
+  onDelete,
+  onPickDate,
+}) {
   const d = toLocalDate(anchor);
   const year = d.getFullYear();
   const month = d.getMonth() + 1;
@@ -57,14 +65,14 @@ export default function MonthView({ anchor, events, onDelete, onPickDate }) {
             {recur
               .filter((r) => r.ymd === ymd)
               .map((r) => (
-                <div
+                <RecurCheck
                   key={r.item.id}
-                  className={styles.recurChip}
-                  title={r.quarterly ? "분기 업무" : "매월 업무"}
-                >
-                  {r.quarterly ? "분기 " : ""}
-                  {r.item.label}
-                </div>
+                  ymd={ymd}
+                  item={r.item}
+                  quarterly={r.quarterly}
+                  days={dayData}
+                  onChangeDay={onChangeDay}
+                />
               ))}
             {list.map((ev) => (
               <EventChip key={ev.id} ev={ev} onDelete={onDelete} showTime />

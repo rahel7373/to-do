@@ -25,7 +25,10 @@ export default function MeetingCell({
   onPatch,
   onAddRule,
   onDeleteRule,
+  onMove,
 }) {
+  const [moving, setMoving] = useState(false); // 날짜 변경 입력 중
+  const [moveTo, setMoveTo] = useState(ymd);
   const [draft, setDraft] = useState(null); // 반복 설정 중이면 설정값
   const name = `${label} 회의 ${index + 1}`;
   const empty =
@@ -109,6 +112,21 @@ export default function MeetingCell({
         {!empty && (
           <button
             type="button"
+            className={styles.cancelButton}
+            onClick={() => {
+              setMoveTo(ymd);
+              setMoving((v) => !v);
+            }}
+            aria-expanded={moving}
+            aria-label={`${name} 날짜 변경`}
+            title="회의 날짜 변경 (새로 입력하지 않고 옮기기)"
+          >
+            날짜
+          </button>
+        )}
+        {!empty && (
+          <button
+            type="button"
             className={`${styles.cancelButton} ${
               m.cancelled ? styles.cancelButtonOn : ""
             }`}
@@ -132,6 +150,31 @@ export default function MeetingCell({
           </button>
         )}
       </div>
+
+      {moving && (
+        <div className={styles.meetingTop}>
+          <input
+            className={styles.cellInput}
+            type="date"
+            value={moveTo}
+            onChange={(e) => setMoveTo(e.target.value)}
+            aria-label={`${name} 옮길 날짜`}
+          />
+          <button
+            type="button"
+            className={styles.cancelButton}
+            disabled={!moveTo || moveTo === ymd}
+            onClick={() => {
+              const msg = onMove(moveTo);
+              if (msg) alert(msg);
+              else setMoving(false);
+            }}
+            aria-label={`${name} 날짜로 이동`}
+          >
+            이동
+          </button>
+        </div>
+      )}
 
       {/* 장소: 직접 입력을 고르면 목록 대신 입력칸만 보인다. */}
       {m.place === CUSTOM_PLACE ? (

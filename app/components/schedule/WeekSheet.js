@@ -45,6 +45,7 @@ export default function WeekSheet({
   onChangeDay,
   onAddRule,
   onDeleteRule,
+  onMoveMeeting,
   onChangeConfig,
   editItems,
 }) {
@@ -371,6 +372,7 @@ export default function WeekSheet({
                     onPatch={(patch) => setItem(ymd, "meetings", slot, patch)}
                     onAddRule={onAddRule}
                     onDeleteRule={onDeleteRule}
+                    onMove={(to) => onMoveMeeting(ymd, slot, to)}
                   />
                   {i === meetingRows - 1 &&
                     meetingRows < MEETING_SLOTS &&

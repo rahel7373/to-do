@@ -6,7 +6,7 @@ import styles from "./Schedule.module.css";
 
 // 월간 달력 한 칸: 휴가·교육 표시와 회의 (주간 시트와 같은 데이터)
 // 칸이 작아서 버튼은 숨기고, 항목을 우클릭(또는 길게 누름)하면 작은 메뉴로 취소·삭제를 한다.
-export default function DayChips({ ymd, mark, meetings, onChangeDay }) {
+export default function DayChips({ ymd, mark, meetings, todos = [], onChangeDay, onOpen }) {
   const [menu, setMenu] = useState(null); // "mark" | 회의 칸 번호
 
   useEffect(() => {
@@ -26,13 +26,64 @@ export default function DayChips({ ymd, mark, meetings, onChangeDay }) {
     setMenu(key);
   };
 
+  // 칩을 누르면 그날의 주간 시트로 이동한다 (체크박스·메뉴는 제외).
+  const go = (e) => {
+    e.stopPropagation();
+    onOpen?.(ymd);
+  };
+
   return (
     <>
+      {todos.map(({ index, todo }) => (
+        <span
+          key={`t${index}`}
+          className={`${styles.chip} ${styles.chipMenuHost} ${styles.work} ${
+            todo.done ? styles.chipDone : ""
+          }`}
+          onClick={go}
+          onContextMenu={open(`t${index}`)}
+          title="누르면 주간 시트로 · 우클릭: 삭제"
+        >
+          <input
+            type="checkbox"
+            className={styles.chipCheck}
+            checked={!!todo.done}
+            onClick={(e) => e.stopPropagation()}
+            onChange={() =>
+              onChangeDay(ymd, (d) => ({
+                ...d,
+                todos: d.todos.map((t, i) => (i === index ? { ...t, done: !t.done } : t)),
+              }))
+            }
+            aria-label={`${ymd} 업무 ${todo.text} 수행 체크`}
+          />
+          <span className={styles.chipText}>{todo.text}</span>
+          {menu === `t${index}` && (
+            <span className={styles.chipMenu}>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setMenu(null);
+                  onChangeDay(ymd, (d) => ({
+                    ...d,
+                    todos: d.todos.map((t, i) => (i === index ? { text: "", done: false } : t)),
+                  }));
+                }}
+                aria-label={`${ymd} 업무 ${todo.text} 삭제`}
+              >
+                삭제
+              </button>
+            </span>
+          )}
+        </span>
+      ))}
       {mark && (
         <span
           className={`${styles.chip} ${styles.chipMenuHost} ${styles[`mk_${mark.kind}`]}`}
+          onClick={go}
           onContextMenu={open("mark")}
-          title="우클릭: 삭제"
+          title="누르면 주간 시트로 · 우클릭: 삭제"
         >
           <span className={styles.chipText}>{markText(mark)}</span>
           {menu === "mark" && (
@@ -60,8 +111,9 @@ export default function DayChips({ ymd, mark, meetings, onChangeDay }) {
           } ${meeting.cancelled ? styles.meetCancelled : ""} ${
             meeting.done ? styles.chipDone : ""
           }`}
+          onClick={go}
           onContextMenu={open(index)}
-          title="우클릭: 중요·취소 표시"
+          title="누르면 주간 시트로 · 우클릭: 중요·취소 표시"
         >
           <input
             type="checkbox"

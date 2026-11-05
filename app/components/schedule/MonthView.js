@@ -11,7 +11,7 @@ import {
 import { eventsOn, sortAllDay } from "../../lib/schedule";
 import { recurringInMonth } from "../../lib/recurring";
 import DayChips from "./DayChips";
-import { markOn, meetingsOn } from "../../lib/dayEntries";
+import { markOn, meetingsOn, todosOn } from "../../lib/dayEntries";
 import EventForm from "./EventForm";
 import RecurCheck from "./RecurCheck";
 import EventChip from "./EventChip";
@@ -29,6 +29,7 @@ export default function MonthView({
   onDelete,
   onToggleEvent,
   onAdd,
+  onOpenWeek,
   onPickDate,
 }) {
   const [adding, setAdding] = useState(""); // 입력창이 열린 날짜
@@ -129,6 +130,8 @@ export default function MonthView({
               ymd={ymd}
               mark={markOn(dayData, rules, ymd)}
               meetings={meetingsOn(dayData, rules, ymd)}
+              todos={todosOn(dayData, rules, ymd)}
+              onOpen={onOpenWeek}
               onChangeDay={onChangeDay}
             />
             {list.map((ev) => (

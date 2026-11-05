@@ -1646,3 +1646,35 @@
 .meetChip.meetCancelled .chipText {
   text-decoration: line-through;
 }
+
+/* 월간 칩: 버튼 없이 컴팩트하게, 우클릭하면 작은 메뉴 */
+.chipMenuHost {
+  position: relative;
+  justify-content: flex-start;
+  cursor: context-menu;
+}
+.chipMenu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 20;
+  margin-top: 2px;
+  padding: 3px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  background: #fff;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.18);
+}
+.chipMenu button {
+  padding: 3px 10px;
+  border: none;
+  border-radius: 4px;
+  background: none;
+  color: #b64340;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.chipMenu button:hover {
+  background: #fbe4e4;
+}

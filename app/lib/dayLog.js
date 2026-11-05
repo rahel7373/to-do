@@ -44,6 +44,7 @@ const emptyMeeting = () => ({
   custom: "",
   title: "",
   important: false,
+  cancelled: false, // 회의가 취소됨 (지우지 않고 취소선으로 표시)
 });
 
 // 반복 회의 규칙
@@ -192,6 +193,7 @@ export function packDay(day, ymd, rules = []) {
     a.custom === b.custom &&
     a.title === b.title &&
     !!a.important === !!b.important &&
+    !!a.cancelled === !!b.cancelled &&
     (a.ruleId ?? "") === (b.ruleId ?? "");
   return {
     ...day,

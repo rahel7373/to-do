@@ -84,7 +84,9 @@ export default function MeetingCell({
 
   return (
     <div
-      className={`${styles.meeting} ${m.important ? styles.important : ""}`}
+      className={`${styles.meeting} ${m.important ? styles.important : ""} ${
+        m.cancelled ? styles.cancelled : ""
+      }`}
     >
       <div className={styles.meetingTop}>
         <input
@@ -104,6 +106,20 @@ export default function MeetingCell({
         >
           {m.important ? "★" : "☆"}
         </button>
+        {!empty && (
+          <button
+            type="button"
+            className={`${styles.cancelButton} ${
+              m.cancelled ? styles.cancelButtonOn : ""
+            }`}
+            onClick={() => onPatch({ cancelled: !m.cancelled })}
+            aria-pressed={!!m.cancelled}
+            aria-label={`${name} 취소 표시`}
+            title={m.cancelled ? "취소 표시 해제" : "회의가 취소되면 눌러 표시"}
+          >
+            {m.cancelled ? "취소됨" : "취소"}
+          </button>
+        )}
         {empty && (
           <button
             type="button"

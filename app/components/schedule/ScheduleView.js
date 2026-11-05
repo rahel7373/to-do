@@ -211,6 +211,50 @@ export default function ScheduleView({ view, onChangeView, top }) {
     return "";
   }
 
+  // 할 일(업무) 날짜 변경: 새 날짜의 빈 할 일 칸으로 옮긴다.
+  function moveTodo(fromYmd, index, toYmd) {
+    if (!toYmd || toYmd === fromYmd) return "";
+    const t = getDay(days, fromYmd, rules).todos[index];
+    if (!t || !t.text.trim()) return "";
+    const target = getDay(days, toYmd, rules).todos.findIndex((x) => !x.text.trim());
+    if (target < 0) return "그 날은 할 일 칸이 가득 찼어요.";
+    setDays((prev) => {
+      const next = { ...prev };
+      const from = getDay(next, fromYmd, rules);
+      next[fromYmd] = packDay(
+        {
+          ...from,
+          todos: from.todos.map((x, i) => (i === index ? { text: "", done: false } : x)),
+        },
+        fromYmd,
+        rules
+      );
+      const to = getDay(next, toYmd, rules);
+      next[toYmd] = packDay(
+        { ...to, todos: to.todos.map((x, i) => (i === target ? { ...t } : x)) },
+        toYmd,
+        rules
+      );
+      return next;
+    });
+    return "";
+  }
+
+  // 휴가·교육·휴무 표시 날짜 변경 (하루에 표시는 하나만 있다)
+  function moveMark(fromYmd, toYmd) {
+    if (!toYmd || toYmd === fromYmd) return "";
+    const mark = getDay(days, fromYmd, rules).mark;
+    if (!mark) return "";
+    if (getDay(days, toYmd, rules).mark) return "그 날에는 이미 휴가·교육 표시가 있어요.";
+    setDays((prev) => {
+      const next = { ...prev };
+      next[fromYmd] = packDay({ ...getDay(next, fromYmd, rules), mark: null }, fromYmd, rules);
+      next[toYmd] = packDay({ ...getDay(next, toYmd, rules), mark }, toYmd, rules);
+      return next;
+    });
+    return "";
+  }
+
   // 월간에서 칩을 누르면 그날이 있는 주간 시트로 이동한다.
   function openWeek(ymd) {
     setAnchor(ymd);
@@ -339,6 +383,8 @@ export default function ScheduleView({ view, onChangeView, top }) {
           config={config}
           onChangeDay={changeDay}
           onMoveMeeting={moveMeeting}
+          onMoveTodo={moveTodo}
+          onMoveMark={moveMark}
           onAddRule={(rule) => setRules((prev) => [...prev, rule])}
           onDeleteRule={(id) =>
             setRules((prev) => prev.filter((r) => r.id !== id))
@@ -359,6 +405,8 @@ export default function ScheduleView({ view, onChangeView, top }) {
           onToggleEvent={toggleEvent}
           onAdd={addEvent}
           onMoveMeeting={moveMeeting}
+          onMoveTodo={moveTodo}
+          onMoveMark={moveMark}
           onOpenWeek={openWeek}
           onPickDate={pickDate}
         />
@@ -382,6 +430,10 @@ export default function ScheduleView({ view, onChangeView, top }) {
           rules={rules}
           recurLabels={config.recurLabels}
           onPickMonth={pickMonth}
+          onOpenWeek={openWeek}
+          onMoveMeeting={moveMeeting}
+          onMoveTodo={moveTodo}
+          onMoveMark={moveMark}
         />
       )}
       </div>

@@ -13,6 +13,7 @@ import {
 } from "../../lib/dayLog";
 import { holidayOf } from "../../lib/holidays";
 import MeetingCell from "./MeetingCell";
+import MovePicker from "./MovePicker";
 import { isEmptyMeeting, meetingOrder } from "../../lib/dayEntries";
 import { recurringOn } from "../../lib/recurring";
 import { eventsOn } from "../../lib/schedule";
@@ -46,6 +47,8 @@ export default function WeekSheet({
   onAddRule,
   onDeleteRule,
   onMoveMeeting,
+  onMoveTodo,
+  onMoveMark,
   onChangeConfig,
   editItems,
 }) {
@@ -310,6 +313,13 @@ export default function WeekSheet({
                         ))}
                       </select>
                       {mark && (
+                        <MovePicker
+                          from={ymd}
+                          label={`${label(ymd)} ${markLabel || "휴가·교육"}`}
+                          onMove={(to) => onMoveMark(ymd, to)}
+                        />
+                      )}
+                      {mark && (
                         <input
                           className={styles.cellInput}
                           value={mark.text}
@@ -433,6 +443,13 @@ export default function WeekSheet({
                       }
                       aria-label={`${label(ymd)} 할 일 ${i + 1}`}
                     />
+                    {t.text.trim() && (
+                      <MovePicker
+                        from={ymd}
+                        label={`${label(ymd)} 할 일 ${i + 1}`}
+                        onMove={(to) => onMoveTodo(ymd, i, to)}
+                      />
+                    )}
                     {isLast && (
                       <button
                         type="button"

@@ -51,9 +51,24 @@ export default function LongTermTasks() {
                   onChange={(e) => patch(t.id, { done: e.target.checked })}
                   aria-label={`${t.title} 완료`}
                 />
-                <span className={t.done ? styles.longDone : styles.longText}>
-                  {t.title}
-                </span>
+                <textarea
+                  className={`${styles.longTitleInput} ${
+                    t.done ? styles.longDone : styles.longText
+                  }`}
+                  value={t.title}
+                  rows={1}
+                  ref={(el) => {
+                    if (el) {
+                      el.style.height = "auto";
+                      el.style.height = `${el.scrollHeight}px`;
+                    }
+                  }}
+                  onChange={(e) =>
+                    patch(t.id, { title: e.target.value.replace(/\n/g, "") })
+                  }
+                  aria-label={`업무 이름 ${t.title}`}
+                  title="눌러서 이름 바꾸기"
+                />
                 <button
                   type="button"
                   className={styles.longBtn}

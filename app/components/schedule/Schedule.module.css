@@ -1846,3 +1846,104 @@
 .chipMenu button:last-child {
   color: #b64340;
 }
+
+/* 날짜 변경 (달력 버튼) */
+.movePicker {
+  position: relative;
+  flex: none;
+}
+.moveToggle {
+  padding: 0 2px;
+  border: none;
+  background: none;
+  font-size: 0.78rem;
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0.55;
+}
+.moveToggle:hover {
+  opacity: 1;
+}
+.movePop {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  z-index: 50;
+  margin-top: 2px;
+  padding: 4px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  background: #fff;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.2);
+  white-space: nowrap;
+}
+.moveRow button {
+  padding: 2px 8px;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  background: #fff;
+  font-size: 0.72rem;
+  cursor: pointer;
+}
+.moveRow button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+/* 연간: 날짜를 눌렀을 때 그날 일정 패널 */
+.yearMonth {
+  cursor: default;
+}
+.yearMonth:hover {
+  border-color: #cbd5e1;
+}
+.yearMonthTitle {
+  padding: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+.yearMonthTitle:hover {
+  color: #2563eb;
+}
+.miniDay {
+  cursor: pointer;
+}
+.miniDay:hover {
+  outline: 1px solid #2563eb;
+}
+.yearDay {
+  margin: 8px 0 2px;
+  padding: 6px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  background: #f8fafc;
+}
+.yearDayLink {
+  margin-right: 6px;
+  padding: 1px 6px;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  background: #fff;
+  font-size: 0.7rem;
+  cursor: pointer;
+}
+.yearDayList {
+  display: grid;
+  gap: 3px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.yearDayList li {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.yearDayList .chip {
+  flex: 1;
+  min-width: 0;
+  margin-top: 0;
+}

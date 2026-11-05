@@ -10,6 +10,8 @@ import { markOn, markText, meetingText, meetingsOn, todosOn } from "../../lib/da
 import { holidayOf } from "../../lib/holidays";
 import { recurringOn } from "../../lib/recurring";
 import { eventsOn } from "../../lib/schedule";
+import { useState } from "react";
+import MovePicker from "./MovePicker";
 import styles from "./Schedule.module.css";
 
 const WEEK_SUN_FIRST = ["일", "월", "화", "수", "목", "금", "토"];
@@ -56,7 +58,12 @@ export default function YearView({
   rules,
   recurLabels,
   onPickMonth,
+  onOpenWeek,
+  onMoveMeeting,
+  onMoveTodo,
+  onMoveMark,
 }) {
+  const [picked, setPicked] = useState(""); // 일정 패널이 열린 날짜
   const year = toLocalDate(anchor).getFullYear();
   const today = todayYMD();
 
@@ -81,14 +88,18 @@ export default function YearView({
             markOn(dayData, rules, `${year}-${pad(m)}-${pad(i + 1)}`)
           ).filter((k) => k && kinds.includes(k.kind)).length;
         return (
-          <button
-            key={m}
-            type="button"
-            className={styles.yearMonth}
-            onClick={() => onPickMonth(first)}
-            aria-label={`${year}년 ${m}월 보기`}
-          >
-            <h3>{m}월</h3>
+          <div key={m} className={styles.yearMonth}>
+            <h3>
+              <button
+                type="button"
+                className={styles.yearMonthTitle}
+                onClick={() => onPickMonth(first)}
+                aria-label={`${year}년 ${m}월 보기`}
+                title="월간 화면으로"
+              >
+                {m}월 ›
+              </button>
+            </h3>
             <div className={styles.miniGrid}>
               {WEEK_SUN_FIRST.map((w) => (
                 <span
@@ -109,6 +120,10 @@ export default function YearView({
                 return (
                   <span
                     key={ymd}
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => setPicked(picked === ymd ? "" : ymd)}
+                    onKeyDown={(e) => e.key === "Enter" && setPicked(picked === ymd ? "" : ymd)}
                     title={dayInfo(events, dayData, rules, ymd, recurLabels) || undefined}
                     className={[
                       styles.miniDay,
@@ -122,12 +137,79 @@ export default function YearView({
                 );
               })}
             </div>
+            {picked.startsWith(`${year}-${pad(m)}-`) && (
+              <div className={styles.yearDay}>
+                <div className={styles.popHead}>
+                  <b>{m}월 {Number(picked.slice(8))}일</b>
+                  <span>
+                    <button
+                      type="button"
+                      className={styles.yearDayLink}
+                      onClick={() => onOpenWeek(picked)}
+                    >
+                      주간 보기
+                    </button>
+                    <button
+                      type="button"
+                      className={styles.chipDelete}
+                      onClick={() => setPicked("")}
+                      aria-label="일정 패널 닫기"
+                    >
+                      ×
+                    </button>
+                  </span>
+                </div>
+                {(() => {
+                  const mark = markOn(dayData, rules, picked);
+                  const meets = meetingsOn(dayData, rules, picked);
+                  const todos = todosOn(dayData, rules, picked);
+                  const others = eventsOn(events, picked);
+                  if (!mark && !meets.length && !todos.length && !others.length)
+                    return <p className={styles.muted}>등록된 일정이 없어요.</p>;
+                  return (
+                    <ul className={styles.yearDayList}>
+                      {mark && (
+                        <li>
+                          <span className={`${styles.chip} ${styles[`mk_${mark.kind}`]}`}>
+                            <span className={styles.chipText}>{markText(mark)}</span>
+                          </span>
+                          <MovePicker from={picked} label={`${picked} ${markText(mark)}`} onMove={(to) => onMoveMark(picked, to)} />
+                        </li>
+                      )}
+                      {meets.map(({ index, meeting }) => (
+                        <li key={`m${index}`}>
+                          <span className={`${styles.chip} ${styles.meetChip} ${meeting.cancelled ? styles.meetCancelled : ""}`}>
+                            <span className={styles.chipText}>{meetingText(meeting)}</span>
+                          </span>
+                          <MovePicker from={picked} label={`${picked} 회의 ${meetingText(meeting)}`} onMove={(to) => onMoveMeeting(picked, index, to)} />
+                        </li>
+                      ))}
+                      {todos.map(({ index, todo }) => (
+                        <li key={`t${index}`}>
+                          <span className={`${styles.chip} ${styles.work} ${todo.done ? styles.chipDone : ""}`}>
+                            <span className={styles.chipText}>{todo.text}</span>
+                          </span>
+                          <MovePicker from={picked} label={`${picked} 업무 ${todo.text}`} onMove={(to) => onMoveTodo(picked, index, to)} />
+                        </li>
+                      ))}
+                      {others.map((e) => (
+                        <li key={e.id}>
+                          <span className={`${styles.chip} ${styles[e.type]}`}>
+                            <span className={styles.chipText}>{e.title}</span>
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  );
+                })()}
+              </div>
+            )}
             <p className={styles.yearCounts}>
               업무 {count("work") + todoCount} · 휴일 {count("holiday") + marked(["off"])} · 휴가{" "}
               {count("leave") + marked(["leave"])} · 교육{" "}
               {marked(["training"])}
             </p>
-          </button>
+          </div>
         );
       })}
       <aside className={styles.yearHelp} aria-label="연간 도움말">
@@ -140,8 +222,8 @@ export default function YearView({
           <li><span className={`${styles.swatch} ${styles.weekendText}`}>1</span>토·일요일</li>
         </ul>
         <p>
-          날짜에 마우스를 올리면 그날 내용이 보여요. 달 칸을 누르면 그 달의
-          월간 화면으로 이동해요.
+          날짜에 마우스를 올리면 그날 내용이 보여요. 날짜를 누르면 그날 일정이
+          나오고 📅로 날짜를 옮길 수 있어요. 달 이름을 누르면 월간 화면으로 가요.
         </p>
       </aside>
     </div>

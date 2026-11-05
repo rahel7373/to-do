@@ -1550,3 +1550,16 @@
   background: #e6e1f6;
   color: #5b49a8;
 }
+
+/* 분기 보기: 1~4분기를 위에서 아래로 이어서 */
+.quarterBlock {
+  margin-bottom: 18px;
+  scroll-margin-top: 8px;
+}
+
+.quarterHead {
+  margin: 0 0 6px;
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #1e293b;
+}

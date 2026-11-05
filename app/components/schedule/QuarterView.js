@@ -1,6 +1,6 @@
 "use client";
 
-import { useLayoutEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { daysInMonth, toLocalDate } from "../../lib/date";
 import { EVENT_TYPES } from "../../lib/schedule";
 import { describeRule } from "../../lib/dayLog";
@@ -21,34 +21,30 @@ export default function QuarterView({
   onDelete,
 }) {
   const wrapRef = useRef(null);
-  // 한 화면에 다 보이도록 화면 높이에 맞춰 크기를 줄인다 (최소 50%).
-  useLayoutEffect(() => {
-    const el = wrapRef.current;
-    if (!el) return;
-    const fit = () => {
-      el.style.zoom = "1";
-      const natural = el.getBoundingClientRect().height;
-      const room = window.innerHeight - 24;
-      el.style.zoom = String(Math.max(0.5, Math.min(1, room / natural)));
-    };
-    fit();
-    window.addEventListener("resize", fit);
-    return () => window.removeEventListener("resize", fit);
-  });
   const d = toLocalDate(anchor);
   const year = d.getFullYear();
-  const firstMonth = Math.floor(d.getMonth() / 3) * 3 + 1;
-  const months = [firstMonth, firstMonth + 1, firstMonth + 2];
+  const anchorQuarter = Math.floor(d.getMonth() / 3) + 1;
 
-  const quarter = (firstMonth + 2) / 3;
+  // 1~4분기를 위에서 아래로 이어서 보여 주고, 선택한 분기가 있는 줄로 스크롤한다.
+  useEffect(() => {
+    wrapRef.current
+      ?.querySelector(`[data-q="${anchorQuarter}"]`)
+      ?.scrollIntoView({ block: "start" });
+  }, [year, anchorQuarter]);
+
   return (
     <div ref={wrapRef}>
     <h2 className={styles.viewTitle}>
-      {year}년 <b>{quarter}분기</b>
-      <span className={styles.viewSub}>
-        ({months[0]}월 ~ {months[2]}월)
-      </span>
+      {year}년 <b>분기별 업무</b>
+      <span className={styles.viewSub}>(스크롤하면 다음 분기가 이어서 나옵니다)</span>
     </h2>
+    {[1, 2, 3, 4].map((q) => {
+    const months = [q * 3 - 2, q * 3 - 1, q * 3];
+    return (
+    <div key={q} data-q={q} className={styles.quarterBlock}>
+    <h3 className={styles.quarterHead}>
+      {q}분기 <span className={styles.viewSub}>({months[0]}월 ~ {months[2]}월)</span>
+    </h3>
     <div className={styles.quarter}>
       {months.map((m) => {
         const from = `${year}-${pad(m)}-01`;
@@ -203,6 +199,9 @@ export default function QuarterView({
         );
       })}
     </div>
+    </div>
+    );
+    })}
     </div>
   );
 }

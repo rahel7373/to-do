@@ -390,8 +390,8 @@
   color: #991b1b;
 }
 .day_leave {
-  background: #dcfce7;
-  color: #166534;
+  background: #fbcfe8;
+  color: #9d174d;
 }
 
 .yearCounts {
@@ -1547,8 +1547,8 @@
   font-weight: 700;
 }
 .day_training {
-  background: #e6e1f6;
-  color: #5b49a8;
+  background: #d9f99d;
+  color: #3f6212;
 }
 
 /* 분기 보기: 1~4분기를 위에서 아래로 이어서 */
@@ -1691,4 +1691,42 @@
 .meetChip.meetImportant .chipText::before {
   content: "★ ";
   color: #e0922a;
+}
+
+/* 연간 도움말 (12월 옆 빈칸) */
+.yearHelp {
+  padding: 10px;
+  border: 1px dashed #cbd5e1;
+  border-radius: 8px;
+  background: #f8fafc;
+  font-size: 0.78rem;
+  color: #475569;
+}
+.yearHelp h3 {
+  margin: 0 0 8px;
+  font-size: 0.95rem;
+}
+.yearHelp p {
+  margin: 8px 0 0;
+  line-height: 1.5;
+}
+.legend {
+  display: grid;
+  gap: 5px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.legend li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.swatch {
+  display: inline-block;
+  min-width: 26px;
+  padding: 2px 0;
+  border-radius: 3px;
+  text-align: center;
+  font-size: 0.75rem;
 }

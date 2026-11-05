@@ -121,6 +121,20 @@ export default function YearView({
           </button>
         );
       })}
+      <aside className={styles.yearHelp} aria-label="연간 도움말">
+        <h3>도움말</h3>
+        <ul className={styles.legend}>
+          <li><span className={`${styles.swatch} ${styles.day_work}`}>1</span>업무</li>
+          <li><span className={`${styles.swatch} ${styles.day_training}`}>1</span>교육</li>
+          <li><span className={`${styles.swatch} ${styles.day_leave}`}>1</span>휴가</li>
+          <li><span className={`${styles.swatch} ${styles.day_holiday}`}>1</span>기타 휴무·휴일</li>
+          <li><span className={`${styles.swatch} ${styles.weekendText}`}>1</span>토·일요일</li>
+        </ul>
+        <p>
+          날짜에 마우스를 올리면 그날 내용이 보여요. 달 칸을 누르면 그 달의
+          월간 화면으로 이동해요.
+        </p>
+      </aside>
     </div>
     </>
   );

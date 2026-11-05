@@ -32,6 +32,12 @@ const SOLAR = [
   [10, 15, "개원기념일", false],
 ];
 
+// 해당 연도에만 있는 휴일 (선거일 등). 대체공휴일 대상은 아니다.
+const EXTRA = {
+  "2027-07-19": "휴일",
+  "2028-04-12": "국회의원선거일",
+};
+
 const lunarFormat = new Intl.DateTimeFormat("en-u-ca-chinese", {
   month: "numeric",
   day: "numeric",
@@ -69,6 +75,12 @@ function buildYear(year) {
     }
   }
 
+  for (const [date, name] of Object.entries(EXTRA)) {
+    if (date.startsWith(`${year}-`)) {
+      groups.push({ name, dates: [date], multi: false, sub: false });
+    }
+  }
+
   for (const g of groups) {
     g.dates.forEach((date, i) => {
       const label = g.multi && i !== 1 ? `${g.name} 연휴` : g.name;
@@ -80,6 +92,9 @@ function buildYear(year) {
   const seen = new Set();
   for (const g of groups) {
     const overlap = g.dates.some((d) => seen.has(d));
+    // 겹친 공휴일 이름 (예: 2028 개천절과 추석 연휴가 겹침)
+    const others = groups.filter((o) => o !== g && o.dates.some((d) => g.dates.includes(d)));
+    const subName = [g.name, ...others.map((o) => o.name)];
     const weekend = g.dates.some((d) => {
       const w = dayOfWeek(d);
       return w === 0 || (!g.multi && w === 6);
@@ -91,14 +106,14 @@ function buildYear(year) {
     while (dayOfWeek(day) === 0 || dayOfWeek(day) === 6 || map.has(day)) {
       day = shift(day, 1);
     }
-    map.set(day, { name: `대체공휴일(${g.name})`, kind: "off" });
+    map.set(day, { name: `대체공휴일(${subName.join("·")})`, kind: "off" });
   }
 
-  // 노조설립일: 8월 첫 금요일, 오전만 근무
+  // 병원 전체 오후 반차: 8월 첫 금요일, 오전만 근무
   for (let d = 1; d <= 7; d++) {
     const ymd = toYMD(year, 8, d);
     if (dayOfWeek(ymd) === 5 && !map.has(ymd)) {
-      map.set(ymd, { name: "노조설립일", kind: "half" });
+      map.set(ymd, { name: "오후 반차(병원 전체)", kind: "half" });
     }
   }
   return map;

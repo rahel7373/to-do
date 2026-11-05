@@ -1,7 +1,17 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { EVENT_TYPES, toMinutes } from "../../lib/schedule";
+import { toMinutes } from "../../lib/schedule";
+
+// 휴가·외부 교육·기타 휴무·회의는 업무 시트에 들어가 어느 화면에서나 보인다.
+const FORM_TYPES = [
+  ["work", "업무"],
+  ["meeting", "회의"],
+  ["leave", "휴가"],
+  ["training", "외부 교육"],
+  ["off", "기타 휴무"],
+  ["holiday", "휴일"],
+];
 import styles from "./Schedule.module.css";
 
 export default function EventForm({ defaultDate, onAdd }) {
@@ -21,12 +31,13 @@ export default function EventForm({ defaultDate, onAdd }) {
   function handleSubmit(e) {
     e.preventDefault();
     if (!type) return;
-    const label = EVENT_TYPES[type].label;
+    const label = FORM_TYPES.find(([k]) => k === type)[1];
     const trimmed = title.trim();
-    if (type === "work" && !trimmed) return setError("업무 내용을 입력하세요.");
+    if ((type === "work" || type === "meeting") && !trimmed) return setError("업무 내용을 입력하세요.");
     if (!startDate) return setError("시작일을 선택하세요.");
 
     const timed = type === "work" && (startTime || endTime);
+    const meetingTime = type === "meeting" ? startTime : "";
     if (timed) {
       if (!startTime || !endTime)
         return setError("시작·종료 시간을 모두 입력하세요.");
@@ -37,19 +48,19 @@ export default function EventForm({ defaultDate, onAdd }) {
     const end = timed ? startDate : endDate || startDate;
     if (end < startDate) return setError("종료일이 시작일보다 빠릅니다.");
 
-    onAdd({
+    const problem = onAdd({
       type,
       title: trimmed || label,
       startDate,
       endDate: end,
-      startTime: timed ? startTime : null,
+      startTime: timed ? startTime : meetingTime || null,
       endTime: timed ? endTime : null,
     });
     setTitle("");
     setEndDate("");
     setStartTime("");
     setEndTime("");
-    setError("");
+    setError(problem || "");
     setType(""); // 다시 접어 공간을 아낀다
   }
 
@@ -64,7 +75,7 @@ export default function EventForm({ defaultDate, onAdd }) {
         aria-label="종류"
       >
         <option value="">종류 선택</option>
-        {Object.entries(EVENT_TYPES).map(([key, { label }]) => (
+        {FORM_TYPES.map(([key, label]) => (
           <option key={key} value={key}>
             {label}
           </option>
@@ -76,7 +87,13 @@ export default function EventForm({ defaultDate, onAdd }) {
         className={`${styles.field} ${styles.titleField}`}
         value={title}
         onChange={(e) => setTitle(e.target.value)}
-        placeholder={type === "work" ? "업무 내용" : "메모 (선택)"}
+        placeholder={
+          type === "work"
+            ? "업무 내용"
+            : type === "meeting"
+              ? "회의 제목"
+              : "메모 (선택)"
+        }
         aria-label="내용"
       />
       <label className={styles.fieldLabel}>
@@ -99,6 +116,17 @@ export default function EventForm({ defaultDate, onAdd }) {
           onChange={(e) => setEndDate(e.target.value)}
         />
       </label>
+      {type === "meeting" && (
+        <label className={styles.fieldLabel}>
+          시간 (선택)
+          <input
+            className={styles.field}
+            type="time"
+            value={startTime}
+            onChange={(e) => setStartTime(e.target.value)}
+          />
+        </label>
+      )}
       {type === "work" && (
         <>
           <label className={styles.fieldLabel}>

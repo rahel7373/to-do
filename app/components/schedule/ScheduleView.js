@@ -11,6 +11,7 @@ import {
 import {
   DEFAULT_MEETING_RULES,
   DEFAULT_SHEET_CONFIG,
+  MARK_KINDS,
   getConfig,
   getDay,
   packDay,
@@ -18,6 +19,7 @@ import {
 import { useLocalList, useLocalState } from "../../lib/useLocalList";
 import EventForm from "./EventForm";
 import LongTermTasks from "./LongTermTasks";
+import { datesBetween, firstFreeSlot } from "../../lib/dayEntries";
 import MonthView from "./MonthView";
 import QuarterView from "./QuarterView";
 import WeekSheet from "./WeekSheet";
@@ -75,11 +77,51 @@ export default function ScheduleView({ view, onChangeView, top }) {
   const ready =
     loaded && daysLoaded && rulesLoaded && configLoaded && anchor !== "";
 
+  // 휴가·교육·기타 휴무·회의는 날짜별 업무 시트에 넣어 주간·월간·분기·연간에 함께 보이게 한다.
+  // 돌려주는 문자열은 사용자에게 보여 줄 안내(비어 있으면 성공)이다.
   function addEvent(data) {
+    const dates = datesBetween(data.startDate, data.endDate);
+    if (["leave", "training", "off"].includes(data.type)) {
+      const defaultText = MARK_KINDS.find(([k]) => k === data.type)?.[1] ?? "";
+      const text = data.title === defaultText ? "" : data.title;
+      setDays((prev) => {
+        const next = { ...prev };
+        for (const ymd of dates) {
+          next[ymd] = packDay(
+            { ...getDay(next, ymd, rules), mark: { kind: data.type, text } },
+            ymd,
+            rules
+          );
+        }
+        return next;
+      });
+      return "";
+    }
+    if (data.type === "meeting") {
+      setDays((prev) => {
+        const next = { ...prev };
+        for (const ymd of dates) {
+          const day = getDay(next, ymd, rules);
+          const slot = firstFreeSlot(day.meetings);
+          if (slot < 0) {
+            continue;
+          }
+          const meetings = day.meetings.map((m, i) =>
+            i === slot
+              ? { ...m, time: data.startTime ?? "", title: data.title }
+              : m
+          );
+          next[ymd] = packDay({ ...day, meetings }, ymd, rules);
+        }
+        return next;
+      });
+      return "";
+    }
     setEvents((prev) => [
       ...prev,
       { id: crypto.randomUUID(), createdAt: Date.now(), ...data },
     ]);
+    return "";
   }
 
   // 날짜별 업무 시트 수정: 저장된 값이 없으면 기본값에서 시작한다.
@@ -189,6 +231,7 @@ export default function ScheduleView({ view, onChangeView, top }) {
           anchor={anchor}
           events={events}
           days={days}
+          rules={rules}
           onChangeDay={changeDay}
           onDelete={deleteEvent}
           onPickDate={pickDate}
@@ -199,12 +242,19 @@ export default function ScheduleView({ view, onChangeView, top }) {
           anchor={anchor}
           events={events}
           days={days}
+          rules={rules}
           onChangeDay={changeDay}
           onDelete={deleteEvent}
         />
       )}
       {ready && view === "year" && (
-        <YearView anchor={anchor} events={events} onPickMonth={pickMonth} />
+        <YearView
+          anchor={anchor}
+          events={events}
+          days={days}
+          rules={rules}
+          onPickMonth={pickMonth}
+        />
       )}
       </div>
     </section>

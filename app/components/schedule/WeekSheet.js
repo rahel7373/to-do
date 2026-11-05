@@ -12,6 +12,7 @@ import {
 } from "../../lib/dayLog";
 import { holidayOf } from "../../lib/holidays";
 import MeetingCell from "./MeetingCell";
+import { meetingOrder } from "../../lib/dayEntries";
 import { recurringOn } from "../../lib/recurring";
 import { eventsOn } from "../../lib/schedule";
 import styles from "./Schedule.module.css";
@@ -338,18 +339,21 @@ export default function WeekSheet({
             row(
               labels.meetings,
               (ymd, d) => {
-                const m = d.meetings[i];
-                const key = `${ymd}#${i}`;
+                // 시간 순으로 i번째에 오는 회의 칸
+                const slot = meetingOrder(d.meetings)[i];
+                const m = d.meetings[slot];
+                const key = `${ymd}#${slot}`;
                 return (
                   <MeetingCell
                     ymd={ymd}
                     index={i}
+                    slot={slot}
                     label={label(ymd)}
                     meeting={m}
                     rule={rules.find((r) => r.id === m.ruleId)}
                     open={!!openSlots[key]}
                     onOpen={(v) => setOpenSlots((s) => ({ ...s, [key]: v }))}
-                    onPatch={(patch) => setItem(ymd, "meetings", i, patch)}
+                    onPatch={(patch) => setItem(ymd, "meetings", slot, patch)}
                     onAddRule={onAddRule}
                     onDeleteRule={onDeleteRule}
                   />

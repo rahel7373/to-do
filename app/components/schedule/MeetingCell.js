@@ -16,6 +16,7 @@ const NTH_KEYS = [1, 2, 3, 4, 5, -1];
 export default function MeetingCell({
   ymd,
   index,
+  slot,
   label,
   meeting: m,
   rule,
@@ -57,7 +58,7 @@ export default function MeetingCell({
     const rule = {
       id: crypto.randomUUID(),
       kind: draft.kind,
-      slot: index,
+      slot: slot ?? index,
       time: m.time,
       place: m.place,
       custom: m.custom,

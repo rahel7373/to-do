@@ -30,6 +30,8 @@ export default function MonthView({
   onToggleEvent,
   onAdd,
   onMoveMeeting,
+  onMoveTodo,
+  onMoveMark,
   onOpenWeek,
   onPickDate,
 }) {
@@ -134,6 +136,8 @@ export default function MonthView({
               todos={todosOn(dayData, rules, ymd)}
               onOpen={onOpenWeek}
               onMove={onMoveMeeting}
+              onMoveTodo={onMoveTodo}
+              onMoveMark={onMoveMark}
               onChangeDay={onChangeDay}
             />
             {list.map((ev) => (

@@ -165,6 +165,52 @@ export default function ScheduleView({ view, onChangeView, top }) {
     }));
   }
 
+  // 회의 날짜 변경: 새로 입력하지 않고 다른 날짜로 옮긴다. 안내 문구를 돌려준다(성공이면 빈 문자열).
+  // 반복 회의는 그날 것만 취소 표시하고, 옮긴 날짜에는 한 번짜리 회의로 만든다.
+  function moveMeeting(fromYmd, slot, toYmd) {
+    if (!toYmd || toYmd === fromYmd) return "";
+    const m = getDay(days, fromYmd, rules).meetings[slot];
+    if (!m) return "";
+    const target = firstFreeSlot(getDay(days, toYmd, rules).meetings);
+    if (target < 0) return "그 날은 회의 칸이 가득 찼어요.";
+    const { ruleId, ...rest } = m;
+    const copy = { ...rest, cancelled: false, done: false };
+    const cleared = {
+      time: "",
+      place: "",
+      custom: "",
+      title: "",
+      important: false,
+      cancelled: false,
+      done: false,
+    };
+    setDays((prev) => {
+      const next = { ...prev };
+      const from = getDay(next, fromYmd, rules);
+      next[fromYmd] = packDay(
+        {
+          ...from,
+          meetings: from.meetings.map((x, i) =>
+            i === slot ? (ruleId ? { ...x, cancelled: true } : cleared) : x
+          ),
+        },
+        fromYmd,
+        rules
+      );
+      const to = getDay(next, toYmd, rules);
+      next[toYmd] = packDay(
+        {
+          ...to,
+          meetings: to.meetings.map((x, i) => (i === target ? copy : x)),
+        },
+        toYmd,
+        rules
+      );
+      return next;
+    });
+    return "";
+  }
+
   // 월간에서 칩을 누르면 그날이 있는 주간 시트로 이동한다.
   function openWeek(ymd) {
     setAnchor(ymd);
@@ -292,6 +338,7 @@ export default function ScheduleView({ view, onChangeView, top }) {
           rules={rules}
           config={config}
           onChangeDay={changeDay}
+          onMoveMeeting={moveMeeting}
           onAddRule={(rule) => setRules((prev) => [...prev, rule])}
           onDeleteRule={(id) =>
             setRules((prev) => prev.filter((r) => r.id !== id))
@@ -311,6 +358,7 @@ export default function ScheduleView({ view, onChangeView, top }) {
           onDelete={deleteEvent}
           onToggleEvent={toggleEvent}
           onAdd={addEvent}
+          onMoveMeeting={moveMeeting}
           onOpenWeek={openWeek}
           onPickDate={pickDate}
         />

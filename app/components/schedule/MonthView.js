@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import {
   WEEKDAYS,
   daysInMonth,
@@ -11,6 +12,7 @@ import { eventsOn, sortAllDay } from "../../lib/schedule";
 import { recurringInMonth } from "../../lib/recurring";
 import DayChips from "./DayChips";
 import { markOn, meetingsOn } from "../../lib/dayEntries";
+import EventForm from "./EventForm";
 import RecurCheck from "./RecurCheck";
 import EventChip from "./EventChip";
 import styles from "./Schedule.module.css";
@@ -25,8 +27,11 @@ export default function MonthView({
   recurLabels,
   onChangeDay,
   onDelete,
+  onToggleEvent,
+  onAdd,
   onPickDate,
 }) {
+  const [adding, setAdding] = useState(""); // 입력창이 열린 날짜
   const d = toLocalDate(anchor);
   const year = d.getFullYear();
   const month = d.getMonth() + 1;
@@ -65,7 +70,49 @@ export default function MonthView({
             ].join(" ")}
             onClick={() => onPickDate(ymd)}
           >
-            <div className={styles.dayNum}>{day}</div>
+            <div className={styles.dayNum}>
+              {day}
+              <button
+                type="button"
+                className={styles.cellAdd}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setAdding(adding === ymd ? "" : ymd);
+                }}
+                aria-label={`${ymd} 일정 추가`}
+                title="이 날 일정 추가"
+              >
+                +
+              </button>
+            </div>
+            {adding === ymd && (
+              <div
+                className={`${styles.cellPopover} ${
+                  weekdayIndex(ymd) >= 4 ? styles.popRight : ""
+                }`}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className={styles.popHead}>
+                  <b>{ymd.slice(5).replace("-", "월 ")}일 추가</b>
+                  <button
+                    type="button"
+                    className={styles.chipDelete}
+                    onClick={() => setAdding("")}
+                    aria-label="입력창 닫기"
+                  >
+                    ×
+                  </button>
+                </div>
+                <EventForm
+                  defaultDate={ymd}
+                  onAdd={(data) => {
+                    const r = onAdd(data);
+                    if (!r) setAdding("");
+                    return r;
+                  }}
+                />
+              </div>
+            )}
             {recur
               .filter((r) => r.ymd === ymd)
               .map((r) => (
@@ -85,7 +132,13 @@ export default function MonthView({
               onChangeDay={onChangeDay}
             />
             {list.map((ev) => (
-              <EventChip key={ev.id} ev={ev} onDelete={onDelete} showTime />
+              <EventChip
+                key={ev.id}
+                ev={ev}
+                onDelete={onDelete}
+                onToggle={onToggleEvent}
+                showTime
+              />
             ))}
           </div>
         );

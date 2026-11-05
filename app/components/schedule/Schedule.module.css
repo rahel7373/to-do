@@ -1759,3 +1759,70 @@
   color: #5b3a00;
   font-weight: 700;
 }
+
+/* 월간: 날짜별 입력창과 수행 체크 */
+.monthCell {
+  position: relative;
+}
+.dayNum {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.cellAdd {
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 50%;
+  background: none;
+  color: #94a3b8;
+  font-size: 0.9rem;
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0;
+}
+.monthCell:hover .cellAdd,
+.cellAdd:focus-visible {
+  opacity: 1;
+}
+.cellAdd:hover {
+  border-color: #2563eb;
+  color: #2563eb;
+}
+.cellPopover {
+  position: absolute;
+  top: 26px;
+  left: 4px;
+  z-index: 40;
+  width: 230px;
+  padding: 8px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.22);
+  cursor: default;
+}
+.cellPopover.popRight {
+  left: auto;
+  right: 4px;
+}
+.popHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+  font-size: 0.8rem;
+}
+.chipCheck {
+  flex: none;
+  margin: 0;
+  cursor: pointer;
+}
+.chip:has(.chipCheck) {
+  justify-content: flex-start;
+}
+.chipDone .chipText {
+  text-decoration: line-through;
+  opacity: 0.6;
+}

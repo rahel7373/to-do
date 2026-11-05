@@ -133,6 +133,12 @@ export default function ScheduleView({ view, onChangeView, top }) {
     }));
   }
 
+  function toggleEvent(id) {
+    setEvents((prev) =>
+      prev.map((e) => (e.id === id ? { ...e, done: !e.done } : e))
+    );
+  }
+
   function deleteEvent(id) {
     setEvents((prev) => prev.filter((e) => e.id !== id));
   }
@@ -264,6 +270,8 @@ export default function ScheduleView({ view, onChangeView, top }) {
           recurLabels={config.recurLabels}
           onChangeDay={changeDay}
           onDelete={deleteEvent}
+          onToggleEvent={toggleEvent}
+          onAdd={addEvent}
           onPickDate={pickDate}
         />
       )}

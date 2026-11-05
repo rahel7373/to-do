@@ -1,14 +1,37 @@
 "use client";
 
+import { useLayoutEffect, useRef } from "react";
 import { daysInMonth, toLocalDate } from "../../lib/date";
 import { EVENT_TYPES } from "../../lib/schedule";
 import { recurringInMonth } from "../../lib/recurring";
+import RecurCheck from "./RecurCheck";
 import EventChip from "./EventChip";
 import styles from "./Schedule.module.css";
 
 const pad = (n) => String(n).padStart(2, "0");
 
-export default function QuarterView({ anchor, events, onDelete }) {
+export default function QuarterView({
+  anchor,
+  events,
+  days: dayData,
+  onChangeDay,
+  onDelete,
+}) {
+  const wrapRef = useRef(null);
+  // 한 화면에 다 보이도록 화면 높이에 맞춰 크기를 줄인다 (최소 50%).
+  useLayoutEffect(() => {
+    const el = wrapRef.current;
+    if (!el) return;
+    const fit = () => {
+      el.style.zoom = "1";
+      const natural = el.getBoundingClientRect().height;
+      const room = window.innerHeight - 24;
+      el.style.zoom = String(Math.max(0.5, Math.min(1, room / natural)));
+    };
+    fit();
+    window.addEventListener("resize", fit);
+    return () => window.removeEventListener("resize", fit);
+  });
   const d = toLocalDate(anchor);
   const year = d.getFullYear();
   const firstMonth = Math.floor(d.getMonth() / 3) * 3 + 1;
@@ -16,7 +39,7 @@ export default function QuarterView({ anchor, events, onDelete }) {
 
   const quarter = (firstMonth + 2) / 3;
   return (
-    <>
+    <div ref={wrapRef}>
     <h2 className={styles.viewTitle}>
       {year}년 <b>{quarter}분기</b>
       <span className={styles.viewSub}>
@@ -52,9 +75,14 @@ export default function QuarterView({ anchor, events, onDelete }) {
                           <span className={styles.eventDate}>
                             {r.ymd.slice(5)}
                           </span>
-                          <span className={styles.recurChip}>
-                            {r.item.label}
-                          </span>
+                          <RecurCheck
+                            ymd={r.ymd}
+                            item={r.item}
+                            quarterly={r.quarterly}
+                            days={dayData}
+                            onChangeDay={onChangeDay}
+                            showDate
+                          />
                         </li>
                       ))}
                     </ul>
@@ -85,6 +113,6 @@ export default function QuarterView({ anchor, events, onDelete }) {
         );
       })}
     </div>
-    </>
+    </div>
   );
 }
